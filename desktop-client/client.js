@@ -1,5 +1,4 @@
 const { io } = require("socket.io-client");
-const http = require('http');
 const crypto = require('crypto');
 const { exec } = require('child_process');
 const { keyboard, Key } = require("@nut-tree-fork/nut-js");
@@ -28,6 +27,7 @@ exec(`start ${loginUrl}`);
 
 // Função que faz o polling perguntando ao servidor se a sessão foi autorizada
 function pollForAuth() {
+    const http = BACKEND_URL.startsWith('https') ? require('https') : require('http');
     http.get(`${BACKEND_URL}/api/auth/cli-status?session=${sessionId}`, (res) => {
         let responseData = '';
         res.on('data', chunk => responseData += chunk);
