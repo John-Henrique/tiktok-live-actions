@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
+import { API_BASE_URL } from './config';
 import './widget.css';
 
-const SOCKET_URL = 'http://localhost:3001';
-const GIFTS_API = 'http://localhost:3001/api/available-gifts';
+const SOCKET_URL = API_BASE_URL;
+const GIFTS_API = `${API_BASE_URL}/api/available-gifts`;
 
 const widgetCooldowns = new Map();
 const COOLDOWN_MS = 3000;
@@ -37,7 +38,7 @@ export default function Widget() {
     }
 
     // Fetch user rules
-    fetch('http://localhost:3001/api/rules', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch('${API_BASE_URL}/api/rules', { headers: { 'Authorization': `Bearer ${token}` } })
       .then(res => res.json())
       .then(data => {
          if (data.rules && Array.isArray(data.rules)) {

@@ -471,9 +471,10 @@ app.get('/api/available-gifts', (req, res) => {
         const files = fs.readdirSync(giftsDir);
         const gifts = files.filter(f => f.endsWith('.png') || f.endsWith('.jpg')).map(f => {
             const parts = f.replace(/\.(png|jpg|jpeg)$/i, '').split('-');
+            const publicUrl = process.env.PUBLIC_URL || 'http://localhost:3001';
             return {
                 filename: f, name: parts[0], id: parts.length > 1 ? parts[1] : '',
-                diamondCount: 0, url: `http://localhost:3001/gifts/${f}`
+                diamondCount: 0, url: `${publicUrl}/gifts/${f}`
             };
         });
         res.json(gifts);

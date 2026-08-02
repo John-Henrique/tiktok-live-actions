@@ -31,8 +31,15 @@ jobs:
               git pull origin main
             fi
             
-            # Instala as dependências novas (se houver)
+            # Instala o backend e reinicia o PM2
+            cd backend-engine
             npm install
+            pm2 restart tiktok-backend || pm2 start server.js --name "tiktok-backend"
             
-            # O CloudPanel usa PM2 para rodar aplicações Node.js. 
-            pm2 restart all || echo "PM2 restart falhou, possivelmente não configurado ainda. Ignore."
+            # Instala e compila o frontend (Painel Web) apontando para o domínio oficial
+            cd ../web-dashboard
+            npm install
+            VITE_API_URL=https://live.paginasturbinadas.com.br npm run build
+            
+            # Copia os arquivos compilados do painel para a pasta raiz do site (para o Nginx ler)
+            cp -r dist/* ../

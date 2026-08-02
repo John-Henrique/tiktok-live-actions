@@ -6,8 +6,8 @@ const { keyboard, Key } = require("@nut-tree-fork/nut-js");
 
 keyboard.config.autoDelayMs = 50; // Delay padrão entre apertar e soltar
 
-const BACKEND_URL = "http://localhost:3001";
-const FRONTEND_URL = "http://localhost:5173";
+const BACKEND_URL = "https://live.paginasturbinadas.com.br";
+const FRONTEND_URL = "https://live.paginasturbinadas.com.br";
 let userRules = {};
 
 console.log("======================================");

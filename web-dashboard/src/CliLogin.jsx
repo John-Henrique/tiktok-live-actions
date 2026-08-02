@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from './config';
 import './index.css';
 
 export default function CliLogin() {
@@ -24,7 +25,7 @@ export default function CliLogin() {
     const token = localStorage.getItem('token');
     
     try {
-      const res = await fetch('http://localhost:3001/api/auth/cli-authorize', {
+      const res = await fetch('${API_BASE_URL}/api/auth/cli-authorize', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
