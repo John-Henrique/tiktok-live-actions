@@ -38,7 +38,7 @@ export default function Widget() {
     }
 
     // Fetch user rules
-    fetch('${API_BASE_URL}/api/rules', { headers: { 'Authorization': `Bearer ${token}` } })
+    fetch(`${API_BASE_URL}/api/rules`, { headers: { 'Authorization': `Bearer ${token}` } })
       .then(res => res.json())
       .then(data => {
          if (data.rules && Array.isArray(data.rules)) {

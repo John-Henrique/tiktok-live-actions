@@ -25,7 +25,7 @@ export default function CliLogin() {
     const token = localStorage.getItem('token');
     
     try {
-      const res = await fetch('${API_BASE_URL}/api/auth/cli-authorize', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/cli-authorize`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

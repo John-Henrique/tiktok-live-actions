@@ -299,7 +299,7 @@ export default function App() {
        const token = localStorage.getItem('token');
        const urlsToDelete = [ruleToRemove.actionSound, ruleToRemove.actionVideo].filter(Boolean);
        urlsToDelete.forEach(url => {
-           fetch('${API_BASE_URL}/api/media', {
+           fetch(`${API_BASE_URL}/api/media`, {
              method: 'DELETE',
              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
              body: JSON.stringify({ url })
@@ -322,7 +322,7 @@ export default function App() {
       const rule = rules.find(r => r.id === ruleId);
       if (rule && rule[field]) {
           const token = localStorage.getItem('token');
-          fetch('${API_BASE_URL}/api/media', {
+          fetch(`${API_BASE_URL}/api/media`, {
              method: 'DELETE',
              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
              body: JSON.stringify({ url: rule[field] })
@@ -347,7 +347,7 @@ export default function App() {
     // Clean up old file if changing media
     const oldRule = rules.find(r => r.id === ruleId);
     if (oldRule && oldRule[field]) {
-       fetch('${API_BASE_URL}/api/media', {
+       fetch(`${API_BASE_URL}/api/media`, {
          method: 'DELETE',
          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
          body: JSON.stringify({ url: oldRule[field] })
@@ -357,7 +357,7 @@ export default function App() {
     setUploadingMedia({ ruleId, field });
 
     try {
-      const res = await fetch('${API_BASE_URL}/api/media/upload', {
+      const res = await fetch(`${API_BASE_URL}/api/media/upload`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
@@ -380,7 +380,7 @@ export default function App() {
     setLoadingPix(true);
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('${API_BASE_URL}/api/payments/pix', {
+      const res = await fetch(`${API_BASE_URL}/api/payments/pix`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -409,7 +409,7 @@ export default function App() {
     
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('${API_BASE_URL}/api/auth/password', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -433,7 +433,7 @@ export default function App() {
   const handleDeleteAccount = async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('${API_BASE_URL}/api/auth/account', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/account`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -456,7 +456,7 @@ export default function App() {
     // Poll a cada 3 segundos
     const interval = setInterval(async () => {
       try {
-        const res = await fetch('${API_BASE_URL}/api/auth/me', {
+        const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
