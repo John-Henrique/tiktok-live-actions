@@ -769,9 +769,18 @@ export default function App() {
                 <li>Deixe-o aberto enquanto estiver jogando.</li>
               </ol>
             </div>
+          </div>
+        )}
 
+        {activeTab === 'widget' && (
+          <div className="tab-widget">
+            <div className="saas-header">
+              <h1>Alertas no OBS</h1>
+              <p>Configure widgets para mostrar na tela da sua transmissão.</p>
+            </div>
+            
             <div className="saas-card">
-              <h2>🎥 Widget para OBS Studio (Alertas Visuais)</h2>
+              <h2>🎦 Widget para OBS Studio (Alertas Visuais)</h2>
               <p style={{color: '#a1a1aa', marginTop: '0.5rem', marginBottom: '1rem'}}>
                 Você pode exibir os presentes e os comandos que o seu público envia direto na tela da live.
               </p>
@@ -804,7 +813,7 @@ export default function App() {
 
                 <hr style={{ borderColor: 'rgba(255,255,255,0.1)', margin: '2rem 0' }} />
 
-                <h2>📋 Menu de Presentes (Legenda Visual)</h2>
+                <h2>🧾 Menu de Presentes (Legenda Visual)</h2>
                 <p style={{color: '#a1a1aa', marginTop: '0.5rem', marginBottom: '1rem'}}>
                   Mostre na tela da live quais presentes ativam quais comandos, como um cardápio para incentivar o público.
                 </p>
