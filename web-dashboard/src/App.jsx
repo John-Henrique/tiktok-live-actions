@@ -763,7 +763,7 @@ export default function App() {
                 <input 
                   type="text" 
                   readOnly 
-                  value={`http://localhost:5173/widget?modo=${widgetMode}&token=${localStorage.getItem('token')}`}
+                  value={`${window.location.origin}/widget?modo=${widgetMode}&token=${localStorage.getItem('token')}`}
                   onClick={(e) => { e.target.select(); navigator.clipboard.writeText(e.target.value); showToast('URL copiada para a área de transferência!'); }}
                   style={{cursor: 'pointer', fontFamily: 'monospace', color: '#00E58F', background: 'rgba(0, 229, 143, 0.1)'}}
                 />
