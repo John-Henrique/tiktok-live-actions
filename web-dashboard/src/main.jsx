@@ -6,6 +6,7 @@ import App from './App.jsx'
 import Widget from './Widget.jsx'
 import Login from './Login.jsx'
 import Register from './Register.jsx'
+import LegendOverlay from './LegendOverlay.jsx'
 import Landing from './Landing.jsx'
 
 import CliLogin from './CliLogin.jsx'
@@ -29,6 +30,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/register" element={<Page title="Criar Conta"><Register /></Page>} />
           <Route path="/dashboard" element={<Page title="Painel de Controle"><App /></Page>} />
           <Route path="/widget" element={<Page title="Widget"><Widget /></Page>} />
+          <Route path="/legend" element={<Page title="Legenda"><LegendOverlay /></Page>} />
           <Route path="/cli-login" element={<Page title="Autorização CLI"><CliLogin /></Page>} />
         </Routes>
       </Router>

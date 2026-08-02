@@ -137,6 +137,7 @@ export default function App() {
   // Pega modo "admin" da URL apenas para ver mais logs se quiser
   const [timeLeftStr, setTimeLeftStr] = useState('60 min 0 seg');
   const [widgetMode, setWidgetMode] = useState('presentes');
+  const [legendStyle, setLegendStyle] = useState('vertical');
   
   // States for account tab
   const [newPassword, setNewPassword] = useState('');
@@ -774,7 +775,44 @@ export default function App() {
                 <li style={{marginBottom: '0.5rem'}}>No OBS Studio, em <em>Fontes (Sources)</em>, clique em <strong>+</strong> e escolha <strong>Navegador (Browser)</strong>.</li>
                 <li style={{marginBottom: '0.5rem'}}>Cole a URL no campo correspondente, coloque Largura <strong>600</strong> e Altura <strong>800</strong>.</li>
                 <li>Sempre que uma regra for disparada, a imagem do presente piscará na tela do seu OBS!</li>
-              </ol>
+                </ol>
+
+                <hr style={{ borderColor: 'rgba(255,255,255,0.1)', margin: '2rem 0' }} />
+
+                <h2>📋 Menu de Presentes (Legenda Visual)</h2>
+                <p style={{color: '#a1a1aa', marginTop: '0.5rem', marginBottom: '1rem'}}>
+                  Mostre na tela da live quais presentes ativam quais comandos, como um cardápio para incentivar o público.
+                </p>
+
+                <div className="input-group" style={{marginBottom: '1rem'}}>
+                  <label>Qual formato de exibição você prefere?</label>
+                  <select 
+                    value={legendStyle} 
+                    onChange={e => setLegendStyle(e.target.value)}
+                    className="custom-dropdown"
+                    style={{ padding: '10px', background: '#121214', color: '#fff', border: '1px solid #27272a', borderRadius: '8px', width: '100%', fontSize: '1rem' }}
+                  >
+                    <option value="vertical">Vertical (Lista em coluna - Ideal para as laterais)</option>
+                    <option value="horizontal">Horizontal (Letreiro - Ideal para o rodapé/topo)</option>
+                  </select>
+                </div>
+
+                <div className="input-group">
+                  <label>Link Exclusivo do seu Menu de Presentes</label>
+                  <input 
+                    type="text" 
+                    readOnly 
+                    value={`${window.location.origin}/legend?style=${legendStyle}&token=${localStorage.getItem('token')}`}
+                    onClick={(e) => { e.target.select(); navigator.clipboard.writeText(e.target.value); showToast('URL copiada para a área de transferência!'); }}
+                    style={{cursor: 'pointer', fontFamily: 'monospace', color: '#00E58F', background: 'rgba(0, 229, 143, 0.1)'}}
+                  />
+                </div>
+
+                <ol style={{color: '#e4e4e7', marginLeft: '1.2rem', lineHeight: '1.6', marginTop: '1rem'}}>
+                  <li style={{marginBottom: '0.5rem'}}>Copie a URL acima.</li>
+                  <li style={{marginBottom: '0.5rem'}}>Adicione uma nova Fonte de Navegador (Browser) no OBS.</li>
+                  <li style={{marginBottom: '0.5rem'}}>Para formato Vertical use Largura 300 e Altura 800. Para Horizontal use Largura 1000 e Altura 150.</li>
+                </ol>
             </div>
           </div>
         )}

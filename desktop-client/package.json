@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node client.js",
-    "build": "pkg client.js --targets node18-win-x64 --output dist/TikTokLiveActions.exe",
+    "build": "pkg client.js --targets node18-win-x64 --output dist/TikTokLiveActions.exe && copy node_modules\\@nut-tree-fork\\libnut-win32\\build\\Release\\libnut.node dist\\",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
