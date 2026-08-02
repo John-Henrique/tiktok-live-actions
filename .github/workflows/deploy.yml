@@ -27,10 +27,10 @@ jobs:
               git fetch
               git reset --hard origin/main
             else
-              # Se já for, atualiza a URL para garantir que usa o token e puxa o código
+              # Se já for, atualiza a URL para garantir que usa o token e puxa o código forçadamente
               git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+              git fetch origin
               git reset --hard origin/main
-              git pull origin main
             fi
             
             # Instala o backend e reinicia o PM2
