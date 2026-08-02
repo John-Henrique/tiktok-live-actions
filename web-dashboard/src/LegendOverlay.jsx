@@ -70,7 +70,7 @@ const LegendOverlay = () => {
 
   return (
     <div className={`legend-overlay-container ${style}`}>
-      <div className="legend-title">MENU DE PRESENTES</div>
+      <div className="legend-title">MENU DE AÇÕES</div>
       <div className="legend-list">
         {rules.map((rule, idx) => {
           let giftInfo = gifts.find(g => g.name === rule.triggerValue);
@@ -82,14 +82,16 @@ const LegendOverlay = () => {
           }
 
           if (!giftInfo) return null;
-          
-          let actionTexts = [];
-          if (rule.actionKeypress) actionTexts.push(`Aperta ${rule.actionKeypress}`);
-          if (rule.actionSound) actionTexts.push('Som');
-          if (rule.actionVideo) actionTexts.push('Vídeo');
+          let actionText = rule.actionLabel;
+          if (!actionText) {
+            let actionTexts = [];
+            if (rule.actionKeypress) actionTexts.push(`Aperta ${rule.actionKeypress}`);
+            if (rule.actionSound) actionTexts.push('Som');
+            if (rule.actionVideo) actionTexts.push('Vídeo');
+            actionText = actionTexts.join(' + ');
+          }
 
-          if (actionTexts.length === 0) return null;
-          let actionText = actionTexts.join(' + ');
+          if (!actionText) return null;
 
           return (
             <div key={idx} className="legend-item glassmorphism">

@@ -1167,7 +1167,7 @@ button.btn-primary:hover {
   align-items: center;
   gap: 15px;
   padding: 10px 20px;
-  border-radius: 12px;
+  border-radius: 6px;
   background: rgba(20, 20, 30, 0.6);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);

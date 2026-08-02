@@ -262,10 +262,11 @@ export default function App() {
                    triggerValue: r.triggerValue,
                    actionKeypress: r.actionType === 'keypress' ? r.actionValue : '',
                    actionSound: r.actionType === 'sound' ? r.actionValue : '',
-                   actionVideo: r.actionType === 'video' ? r.actionValue : ''
+                   actionVideo: r.actionType === 'video' ? r.actionValue : '',
+                   actionLabel: r.actionLabel || ''
                 };
              }
-             return r; // already unified format
+             return { ...r, actionLabel: r.actionLabel || '' }; // already unified format
           });
           rulesArray = adapted;
         } else {
@@ -275,7 +276,8 @@ export default function App() {
             triggerValue: key,
             actionKeypress: rulesData.rules[key],
             actionSound: '',
-            actionVideo: ''
+            actionVideo: '',
+            actionLabel: ''
           }));
         }
         setRules(rulesArray);
@@ -298,7 +300,8 @@ export default function App() {
         triggerValue: r.triggerValue,
         actionKeypress: r.actionKeypress || '',
         actionSound: r.actionSound || '',
-        actionVideo: r.actionVideo || ''
+        actionVideo: r.actionVideo || '',
+        actionLabel: r.actionLabel || ''
       }));
 
     const token = localStorage.getItem('token');
@@ -335,7 +338,8 @@ export default function App() {
       triggerValue: availableGifts.length > 0 ? availableGifts[0].name : '', 
       actionKeypress: '',
       actionSound: '',
-      actionVideo: ''
+      actionVideo: '',
+      actionLabel: ''
     }, ...rules]);
   };
 
@@ -763,6 +767,21 @@ export default function App() {
                              )}
                            </div>
                         </div>
+
+                        {/* Texto na Legenda */}
+                        <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                           <span style={{color: '#a1a1aa', fontSize: '0.85rem'}}>💬 Texto na Legenda</span>
+                           <div style={{display: 'flex', gap: '1rem', alignItems: 'center', height: '100%'}}>
+                             <input 
+                               type="text" 
+                               placeholder="Ex: Acelera"
+                               value={rule.actionLabel || ''}
+                               onChange={(e) => updateRule(rule.id, 'actionLabel', e.target.value)}
+                               style={{flex: 1, padding: '0.6rem', border: '2px dashed rgba(255,255,255,0.1)', background: '#18181b', color: '#fff', borderRadius: '8px', fontSize: '0.95rem'}}
+                             />
+                           </div>
+                        </div>
+
 
                       </div>
                       <button 
