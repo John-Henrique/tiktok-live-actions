@@ -206,6 +206,19 @@ export default function App() {
         return;
       }
       
+      try {
+        const userRes = await fetch(`${API_BASE_URL}/api/auth/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (userRes.ok) {
+          const freshUser = await userRes.json();
+          setUser(freshUser);
+          localStorage.setItem('user', JSON.stringify(freshUser));
+        }
+      } catch (e) {
+        console.error('Falha ao atualizar dados do usuario', e);
+      }
+      
       const rulesData = await rulesRes.json();
       
       if (rulesData.targetUsername) {

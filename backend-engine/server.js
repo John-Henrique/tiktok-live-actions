@@ -193,7 +193,7 @@ app.get('/api/admin/stats', authenticateToken, (req, res) => {
     db.get('SELECT is_admin FROM users WHERE id = ?', [req.user.id], (err, user) => {
         if (err || !user || !user.is_admin) return res.status(403).json({ error: 'Acesso Negado' });
 
-        db.all('SELECT id, email, plan_status, trial_used, trial_time_used, created_at FROM users', [], (err, users) => {
+        db.all('SELECT id, email, plan_status, trial_used, trial_time_used, pro_expires_at, created_at FROM users', [], (err, users) => {
             if (err) return res.status(500).json({ error: 'Erro ao buscar usuários' });
             
             db.all('SELECT * FROM payments', [], (err, payments) => {
@@ -229,7 +229,7 @@ app.post('/api/admin/add-trial', authenticateToken, (req, res) => {
             if (err || !targetUser) return res.status(404).json({ error: 'Usuário não encontrado' });
             
             const timeToSubtractMs = minutes * 60 * 1000;
-            const newTimeUsed = Math.max(0, (targetUser.trial_time_used || 0) - timeToSubtractMs);
+            const newTimeUsed = (targetUser.trial_time_used || 0) - timeToSubtractMs;
             
             db.run('UPDATE users SET trial_time_used = ?, trial_used = 0 WHERE id = ?', [newTimeUsed, userId], (err) => {
                 if (err) return res.status(500).json({ error: 'Erro ao atualizar tempo de trial' });

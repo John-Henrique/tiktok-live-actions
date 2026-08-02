@@ -233,7 +233,7 @@ body {
   color: #fff;
   text-decoration: none;
   margin-bottom: 4rem;
-  display: inline-block;
+  display: inline-block; align-self: flex-end;
 }
 .auth-logo span {
   color: #00E58F;
@@ -1387,7 +1387,7 @@ button.btn-primary:hover {
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: bold;
-  display: inline-block;
+  display: inline-block; align-self: flex-end;
   margin-bottom: 1rem;
 }
 
