@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { io } from 'socket.io-client';
 import { API_BASE_URL } from './config';
 import './index.css';
 
@@ -41,9 +42,23 @@ const LegendOverlay = () => {
 
   useEffect(() => {
     fetchData();
-    // Atualiza a cada 10 segundos caso a pessoa mude alguma regra durante a live
-    const interval = setInterval(fetchData, 10000);
-    return () => clearInterval(interval);
+    
+    if (!token) return;
+    
+    // Conecta via WebSocket usando o token para atualizações em tempo real
+    const socket = io(API_BASE_URL, {
+      auth: { token }
+    });
+    
+    // Escuta quando as regras são salvas no banco de dados e recarrega instantaneamente
+    socket.on('rules-updated', (newRules) => {
+        if (Array.isArray(newRules)) setRules(newRules);
+        else fetchData(); // Se o formato não vier perfeito, puxa via API
+    });
+    
+    return () => {
+        socket.disconnect();
+    };
   }, [token]);
 
   // Se não houver token ou regras, não renderiza nada para ficar invisível no OBS
