@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { API_BASE_URL } from './config';
 
 export default function AdminDashboard() {
@@ -180,6 +180,14 @@ export default function AdminDashboard() {
       return acc;
     }, []);
 
+    const liveData = (stats.liveHistory || []).map(entry => {
+      const d = new Date(entry.time);
+      return {
+        name: `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`,
+        conexões: entry.active_count
+      };
+    });
+
     return (
       <>
         <div className="admin-overview" style={{ marginTop: '2rem' }}>
@@ -217,6 +225,27 @@ export default function AdminDashboard() {
                   <Tooltip contentStyle={{ backgroundColor: '#1e1e1e', borderColor: '#333' }} />
                   <Line type="monotone" dataKey="usuarios" stroke="#ff0050" strokeWidth={3} />
                 </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="chart-container" style={{ marginTop: '2rem' }}>
+            <h2>Usuários Simultâneos em Live (Últimas 24h)</h2>
+            <div className="chart-wrapper" style={{ height: '300px', width: '100%' }}>
+              <ResponsiveContainer>
+                <AreaChart data={liveData}>
+                  <defs>
+                    <linearGradient id="colorConexoes" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#00E58F" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#00E58F" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                  <XAxis dataKey="name" stroke="#fff" />
+                  <YAxis stroke="#fff" />
+                  <Tooltip contentStyle={{ backgroundColor: '#1e1e1e', borderColor: '#333' }} />
+                  <Area type="monotone" dataKey="conexões" stroke="#00E58F" fillOpacity={1} fill="url(#colorConexoes)" />
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>

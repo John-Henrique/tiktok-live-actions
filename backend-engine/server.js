@@ -48,6 +48,14 @@ const activeConnections = new Map();
 // Map de Sessões CLI pendentes: sessionId -> { authenticated: boolean, token?: string }
 const cliSessions = new Map();
 
+// Cronjob para logar histórico de usuários ativos (a cada 1 hora)
+setInterval(() => {
+    const count = activeConnections.size;
+    db.run('INSERT INTO live_history (active_count) VALUES (?)', [count], (err) => {
+        if (err) console.error('[DB] Erro ao salvar log de sessoes:', err);
+    });
+}, 60 * 60 * 1000);
+
 // Função para iniciar conexão com o TikTok (Multi-Tenant)
 function connectToTikTok(userId, username, isTrial) {
     if (!username || !userId) return;
@@ -202,13 +210,16 @@ app.get('/api/admin/stats', authenticateToken, (req, res) => {
                     db.get('SELECT SUM(amount) as totalRevenue FROM payments WHERE status = "COMPLETED"', (err, row4) => {
                         const totalRevenue = (row4 && row4.totalRevenue ? row4.totalRevenue : 0) / 100;
                         db.all('SELECT created_at FROM users', (err, usersData) => {
-                            res.json({
-                                totalUsers,
-                                activeAccounts,
-                                trialAccounts,
-                                totalRevenue,
-                                activeConnections: activeConnections.size,
-                                chartData: usersData || []
+                            db.all("SELECT active_count, recorded_at as time FROM live_history WHERE recorded_at >= datetime('now', '-24 hours') ORDER BY recorded_at ASC", (err, liveHistory) => {
+                                res.json({
+                                    totalUsers,
+                                    activeAccounts,
+                                    trialAccounts,
+                                    totalRevenue,
+                                    activeConnections: activeConnections.size,
+                                    chartData: usersData || [],
+                                    liveHistory: liveHistory || []
+                                });
                             });
                         });
                     });

@@ -58,6 +58,31 @@ function initDb() {
         )`);
 
         db.run(`ALTER TABLE payments ADD COLUMN plan_duration INTEGER DEFAULT 30`, (err) => { /* ignora erro */ });
+        
+        // Tabela de Histórico de Sessões em Live
+        db.run(`CREATE TABLE IF NOT EXISTS live_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            active_count INTEGER NOT NULL,
+            recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`, (err) => {
+            if (!err) {
+                // Se a tabela acabou de ser criada, verificar se tá vazia para inserir dummy data
+                db.get('SELECT COUNT(*) as c FROM live_history', (err, row) => {
+                    if (row && row.c === 0) {
+                        console.log('[DB] Gerando dados fictícios para live_history...');
+                        const stmt = db.prepare('INSERT INTO live_history (active_count, recorded_at) VALUES (?, ?)');
+                        const now = new Date();
+                        // Gerar ultimas 24 horas
+                        for (let i = 24; i >= 0; i--) {
+                            let pastTime = new Date(now.getTime() - (i * 60 * 60 * 1000));
+                            let dummyCount = Math.floor(Math.random() * 15) + 2; // de 2 a 16 usuarios
+                            stmt.run(dummyCount, pastTime.toISOString().slice(0, 19).replace('T', ' '));
+                        }
+                        stmt.finalize();
+                    }
+                });
+            }
+        });
     });
 }
 

@@ -143,6 +143,8 @@ export default function App() {
   const [loadingPix, setLoadingPix] = useState(false);
   const [toastMsg, setToastMsg] = useState(null);
   const [uploadingMedia, setUploadingMedia] = useState({ ruleId: null, field: null });
+  const [isLive, setIsLive] = useState(false);
+  const [remainingMs, setRemainingMs] = useState(60 * 60 * 1000);
   
   // Pega modo "admin" da URL apenas para ver mais logs se quiser
   const [timeLeftStr, setTimeLeftStr] = useState('60 min 0 seg');
@@ -174,6 +176,14 @@ export default function App() {
       setTimeout(() => {
         window.location.reload();
       }, 5000);
+    });
+
+    socket.on('tiktok-connected', () => {
+      setIsLive(true);
+    });
+
+    socket.on('tiktok-disconnected', () => {
+      setIsLive(false);
     });
 
     return () => socket.disconnect();
@@ -510,22 +520,35 @@ export default function App() {
   useEffect(() => {
     if (!user || user.plan === 'pro') return;
     
-    // Mostra o tempo estático que o usuário ainda tem de teste
     const localTimeUsed = user.trial_time_used || 0;
+    const totalMs = 60 * 60 * 1000;
     
-    if (user.trial_used || localTimeUsed >= 60 * 60 * 1000) {
-      setTimeLeftStr('0 min 0 seg');
+    if (user.trial_used || localTimeUsed >= totalMs) {
+      setRemainingMs(0);
       return;
     }
     
-    const totalMs = 60 * 60 * 1000;
-    const remaining = Math.max(0, totalMs - localTimeUsed);
-    
-    const mins = Math.floor(remaining / 60000);
-    const secs = Math.floor((remaining % 60000) / 1000);
-    setTimeLeftStr(`${mins} min ${secs} seg`);
-    
+    setRemainingMs(Math.max(0, totalMs - localTimeUsed));
   }, [user]);
+
+  useEffect(() => {
+    if (remainingMs <= 0) {
+       setTimeLeftStr('0 min 0 seg');
+       return;
+    }
+    
+    const mins = Math.floor(remainingMs / 60000);
+    const secs = Math.floor((remainingMs % 60000) / 1000);
+    setTimeLeftStr(`${mins} min ${secs} seg`);
+
+    if (!isLive) return;
+
+    const interval = setInterval(() => {
+      setRemainingMs(prev => Math.max(0, prev - 1000));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [remainingMs, isLive]);
 
   return (
     <div className="saas-layout">
