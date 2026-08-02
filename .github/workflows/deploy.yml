@@ -20,14 +20,16 @@ jobs:
             # Entra na pasta do seu site
             cd htdocs/live.paginasturbinadas.com.br
             
-            # Verifica se já é um repositório git. Se não for, inicializa.
+            # Verifica se já é um repositório git. Se não for, inicializa usando o TOKEN automático do GitHub para repositórios privados
             if [ ! -d ".git" ]; then
               git init
-              git remote add origin https://github.com/John-Henrique/tiktok-live.git
+              git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
               git fetch
               git reset --hard origin/main
             else
-              # Se já for, apenas puxa o código mais recente
+              # Se já for, atualiza a URL para garantir que usa o token e puxa o código
+              git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+              git reset --hard origin/main
               git pull origin main
             fi
             
