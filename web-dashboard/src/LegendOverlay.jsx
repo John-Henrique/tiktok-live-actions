@@ -73,13 +73,23 @@ const LegendOverlay = () => {
       <div className="legend-title">MENU DE PRESENTES</div>
       <div className="legend-list">
         {rules.map((rule, idx) => {
-          const giftInfo = gifts.find(g => g.name === rule.giftId);
+          let giftInfo = gifts.find(g => g.name === rule.triggerValue);
+          
+          if (!giftInfo) {
+              if (rule.triggerValue === 'Novo Seguidor') giftInfo = { name: 'Novo Seguidor', url: 'https://cdn-icons-png.flaticon.com/512/4138/4138124.png' };
+              else if (rule.triggerValue === 'Curtida') giftInfo = { name: 'Curtida', url: 'https://cdn-icons-png.flaticon.com/512/833/833472.png' };
+              else if (rule.triggerValue === 'Compartilhamento') giftInfo = { name: 'Compartilhamento', url: 'https://cdn-icons-png.flaticon.com/512/2823/2823086.png' };
+          }
+
           if (!giftInfo) return null;
           
-          let actionText = '';
-          if (rule.type === 'key') actionText = `Aperta ${rule.key}`;
-          if (rule.type === 'sound') actionText = 'Toca Som';
-          if (rule.type === 'video') actionText = 'Toca Vídeo';
+          let actionTexts = [];
+          if (rule.actionKeypress) actionTexts.push(`Aperta ${rule.actionKeypress}`);
+          if (rule.actionSound) actionTexts.push('Som');
+          if (rule.actionVideo) actionTexts.push('Vídeo');
+
+          if (actionTexts.length === 0) return null;
+          let actionText = actionTexts.join(' + ');
 
           return (
             <div key={idx} className="legend-item glassmorphism">
