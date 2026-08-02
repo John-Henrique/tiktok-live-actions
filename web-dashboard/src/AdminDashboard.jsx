@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { API_BASE_URL } from './config';
 
@@ -13,9 +13,13 @@ export default function AdminDashboard() {
   const [modalUserId, setModalUserId] = useState(null);
   const [modalMinutes, setModalMinutes] = useState('60');
   const [toastMsg, setToastMsg] = useState(null);
-  const [activeTab, setActiveTab] = useState('overview'); // overview, users, subscriptions, finance
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Derivar a aba atual a partir da URL
+  const pathParts = location.pathname.split('/');
+  const activeTab = pathParts[2] || 'overview';
 
   const showToast = (msg, type = 'success') => {
     setToastMsg({ msg, type });
@@ -288,25 +292,25 @@ export default function AdminDashboard() {
         <div className="sidebar-menu">
           <div 
             className={`sidebar-item ${activeTab === 'overview' ? 'active' : ''}`}
-            onClick={() => setActiveTab('overview')}
+            onClick={() => navigate('/admin/overview')}
           >
             <span className="icon">📊</span> Visão Geral
           </div>
           <div 
             className={`sidebar-item ${activeTab === 'finance' ? 'active' : ''}`}
-            onClick={() => setActiveTab('finance')}
+            onClick={() => navigate('/admin/finance')}
           >
             <span className="icon">💰</span> Faturamento
           </div>
           <div 
             className={`sidebar-item ${activeTab === 'users' ? 'active' : ''}`}
-            onClick={() => setActiveTab('users')}
+            onClick={() => navigate('/admin/users')}
           >
             <span className="icon">👥</span> Usuários
           </div>
           <div 
             className={`sidebar-item ${activeTab === 'subscriptions' ? 'active' : ''}`}
-            onClick={() => setActiveTab('subscriptions')}
+            onClick={() => navigate('/admin/subscriptions')}
           >
             <span className="icon">💎</span> Assinaturas
           </div>
@@ -323,7 +327,7 @@ export default function AdminDashboard() {
         </div>
       </aside>
 
-      <main className="saas-main">
+      <main className="saas-content" style={{ width: '100%' }}>
         <header className="saas-header">
           <h1>
             {activeTab === 'overview' && 'Visão Geral do Sistema'}

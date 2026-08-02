@@ -496,30 +496,21 @@ export default function App() {
   useEffect(() => {
     if (!user || user.plan === 'pro') return;
     
-    // Inicia a contagem baseada no tempo já gasto salvo no banco
-    let localTimeUsed = user.trial_time_used || 0;
+    // Mostra o tempo estático que o usuário ainda tem de teste
+    const localTimeUsed = user.trial_time_used || 0;
     
-    const updateTimer = () => {
-      if (user.trial_used || localTimeUsed >= 60 * 60 * 1000) {
-        setTimeLeftStr('0 min 0 seg');
-        return;
-      }
-      
-      const totalMs = 60 * 60 * 1000;
-      const remaining = Math.max(0, totalMs - localTimeUsed);
-      
-      const mins = Math.floor(remaining / 60000);
-      const secs = Math.floor((remaining % 60000) / 1000);
-      setTimeLeftStr(`${mins} min ${secs} seg`);
-      
-      // Simula o gasto de 1 segundo se estivermos ativamente conectados (aqui visualmente o tempo sempre desce)
-      // Se não estiver conectado, não deveríamos descer, mas para simplificar no painel, ele desce e no recarregamento corrige.
-      localTimeUsed += 1000;
-    };
-
-    updateTimer();
-    const timerInterval = setInterval(updateTimer, 1000);
-    return () => clearInterval(timerInterval);
+    if (user.trial_used || localTimeUsed >= 60 * 60 * 1000) {
+      setTimeLeftStr('0 min 0 seg');
+      return;
+    }
+    
+    const totalMs = 60 * 60 * 1000;
+    const remaining = Math.max(0, totalMs - localTimeUsed);
+    
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    setTimeLeftStr(`${mins} min ${secs} seg`);
+    
   }, [user]);
 
   return (

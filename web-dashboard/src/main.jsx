@@ -30,7 +30,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/login" element={<Page title="Entrar"><Login /></Page>} />
           <Route path="/register" element={<Page title="Criar Conta"><Register /></Page>} />
           <Route path="/dashboard/*" element={<Page title="Painel de Controle"><App /></Page>} />
-          <Route path="/admin" element={<Page title="Administração"><AdminDashboard /></Page>} />
+          <Route path="/admin/*" element={<Page title="Administração"><AdminDashboard /></Page>} />
           <Route path="/widget" element={<Page title="Widget"><Widget /></Page>} />
           <Route path="/legend" element={<Page title="Legenda"><LegendOverlay /></Page>} />
           <Route path="/cli-login" element={<Page title="Autorização CLI"><CliLogin /></Page>} />
