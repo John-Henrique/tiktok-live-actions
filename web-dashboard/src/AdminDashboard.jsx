@@ -155,6 +155,7 @@ export default function AdminDashboard() {
 
   const renderPagination = (page, total, limit, setPage) => {
     const totalPages = Math.ceil(total / limit) || 1;
+    if (totalPages <= 1) return null;
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
         <button className="btn-secondary" disabled={page <= 1} onClick={() => setPage(page - 1)}>Anterior</button>
