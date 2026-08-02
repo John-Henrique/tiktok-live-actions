@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import config from './config';
+import { API_BASE_URL } from './config';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -18,7 +18,7 @@ export default function AdminDashboard() {
       }
 
       try {
-        const response = await fetch(`${config.API_URL}/api/admin/stats`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/stats`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -48,7 +48,7 @@ export default function AdminDashboard() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${config.API_URL}/api/admin/add-trial`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/add-trial`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export default function AdminDashboard() {
 
       if (response.ok) {
         alert('Tempo adicionado com sucesso!');
-        const refreshResponse = await fetch(`${config.API_URL}/api/admin/stats`, {
+        const refreshResponse = await fetch(`${API_BASE_URL}/api/admin/stats`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (refreshResponse.ok) {
