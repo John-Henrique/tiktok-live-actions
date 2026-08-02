@@ -189,6 +189,56 @@ app.get('/api/stats', (req, res) => {
     });
 });
 
+app.get('/api/admin/stats', authenticateToken, (req, res) => {
+    db.get('SELECT is_admin FROM users WHERE id = ?', [req.user.id], (err, user) => {
+        if (err || !user || !user.is_admin) return res.status(403).json({ error: 'Acesso Negado' });
+
+        db.all('SELECT id, email, plan_status, trial_used, trial_time_used, created_at FROM users', [], (err, users) => {
+            if (err) return res.status(500).json({ error: 'Erro ao buscar usuários' });
+            
+            db.all('SELECT * FROM payments', [], (err, payments) => {
+                if (err) return res.status(500).json({ error: 'Erro ao buscar pagamentos' });
+
+                const totalUsers = users.length;
+                const activeAccounts = users.filter(u => u.plan_status !== 'free_trial').length;
+                const trialAccounts = users.filter(u => u.plan_status === 'free_trial').length;
+                const totalRevenue = payments.filter(p => p.status === 'COMPLETED').reduce((acc, p) => acc + p.amount, 0) / 100; // in BRL maybe?
+
+                res.json({
+                    totalUsers,
+                    activeAccounts,
+                    trialAccounts,
+                    totalRevenue,
+                    activeConnections: activeConnections.size,
+                    users,
+                    payments
+                });
+            });
+        });
+    });
+});
+
+app.post('/api/admin/add-trial', authenticateToken, (req, res) => {
+    const { userId, minutes } = req.body;
+    if (!userId || !minutes) return res.status(400).json({ error: 'Dados inválidos' });
+    
+    db.get('SELECT is_admin FROM users WHERE id = ?', [req.user.id], (err, user) => {
+        if (err || !user || !user.is_admin) return res.status(403).json({ error: 'Acesso Negado' });
+
+        db.get('SELECT trial_time_used FROM users WHERE id = ?', [userId], (err, targetUser) => {
+            if (err || !targetUser) return res.status(404).json({ error: 'Usuário não encontrado' });
+            
+            const timeToSubtractMs = minutes * 60 * 1000;
+            const newTimeUsed = Math.max(0, (targetUser.trial_time_used || 0) - timeToSubtractMs);
+            
+            db.run('UPDATE users SET trial_time_used = ?, trial_used = 0 WHERE id = ?', [newTimeUsed, userId], (err) => {
+                if (err) return res.status(500).json({ error: 'Erro ao atualizar tempo de trial' });
+                res.json({ success: true, message: `Adicionado ${minutes} minutos de trial.` });
+            });
+        });
+    });
+});
+
 // Middleware de Autenticação REST
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
@@ -226,14 +276,14 @@ app.post('/api/auth/login', (req, res) => {
         }
         
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
-        res.json({ success: true, token, user: { id: user.id, email: user.email, tiktok_username: user.tiktok_username, plan: user.plan_status, trial_used: user.trial_used, trial_time_used: user.trial_time_used } });
+        res.json({ success: true, token, user: { id: user.id, email: user.email, tiktok_username: user.tiktok_username, plan: user.plan_status, trial_used: user.trial_used, trial_time_used: user.trial_time_used, is_admin: user.is_admin } });
     });
 });
 
 app.get('/api/auth/me', authenticateToken, (req, res) => {
-    db.get('SELECT id, email, tiktok_username, plan_status, trial_used, trial_time_used FROM users WHERE id = ?', [req.user.id], (err, user) => {
+    db.get('SELECT id, email, tiktok_username, plan_status, trial_used, trial_time_used, is_admin FROM users WHERE id = ?', [req.user.id], (err, user) => {
         if (err || !user) return res.status(404).json({ error: 'Usuário não encontrado' });
-        res.json({ id: user.id, email: user.email, tiktok_username: user.tiktok_username, plan: user.plan_status, trial_used: user.trial_used, trial_time_used: user.trial_time_used });
+        res.json({ id: user.id, email: user.email, tiktok_username: user.tiktok_username, plan: user.plan_status, trial_used: user.trial_used, trial_time_used: user.trial_time_used, is_admin: user.is_admin });
     });
 });
 

@@ -552,6 +552,15 @@ export default function App() {
             >
               <span className="icon">⚙️</span> Minha Conta
             </div>
+              
+            {user?.is_admin && (
+              <div 
+                className="sidebar-item"
+                onClick={() => navigate('/admin')}
+              >
+                <span className="icon">👑</span> Painel Admin
+              </div>
+            )}
           </div>
       </aside>
 
