@@ -162,6 +162,21 @@ export default function App() {
     }
     setUser(JSON.parse(userData));
     fetchData(token);
+
+    // Conecta o socket para ouvir eventos como pagamento completo
+    const socket = io(API_BASE_URL, {
+      auth: { token }
+    });
+
+    socket.on('payment-completed', () => {
+      setShowConfetti(true);
+      setToastMsg({ msg: 'Pagamento recebido! Você agora é PRO!', type: 'success' });
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
+    });
+
+    return () => socket.disconnect();
   }, [navigate]);
 
   const showToast = (msg, type = 'success') => {
@@ -411,7 +426,6 @@ export default function App() {
       const data = await res.json();
       if (data.success) {
         setPixData(data);
-        startPollingPayment();
       } else {
         showToast('Erro ao gerar PIX: ' + (data.error || 'Desconhecido'), 'error');
       }
