@@ -19,14 +19,21 @@ const db = new sqlite3.Database(dbPath, (err) => {
 // Pegar o email por argumento (ex: node promote-admin.js johnhenrique@gmail.com)
 const emailArg = process.argv[2] || 'johnhenrique@gmail.com';
 
-db.run(`UPDATE users SET is_admin = 1 WHERE email = ?`, [emailArg], function(err) {
-    if (err) {
-        console.error('❌ Erro ao promover usuário:', err.message);
-    } else if (this.changes === 0) {
-        console.warn(`⚠️ O email "${emailArg}" não foi encontrado no banco de dados. Cadastre a conta primeiro se ainda não o fez.`);
-    } else {
-        console.log(`✅ Sucesso! O usuário "${emailArg}" foi promovido a Administrador.`);
-    }
-    
-    db.close();
+db.serialize(() => {
+    // Tenta criar a coluna para garantir
+    db.run(`ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT 0`, (err) => {
+        // Ignora o erro se a coluna já existir
+    });
+
+    db.run(`UPDATE users SET is_admin = 1 WHERE email = ?`, [emailArg], function(err) {
+        if (err) {
+            console.error('❌ Erro ao promover usuário:', err.message);
+        } else if (this.changes === 0) {
+            console.warn(`⚠️ O email "${emailArg}" não foi encontrado no banco de dados. Cadastre a conta primeiro se ainda não o fez.`);
+        } else {
+            console.log(`✅ Sucesso! O usuário "${emailArg}" foi promovido a Administrador.`);
+        }
+        
+        db.close();
+    });
 });
