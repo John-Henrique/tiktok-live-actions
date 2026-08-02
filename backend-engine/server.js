@@ -193,26 +193,120 @@ app.get('/api/admin/stats', authenticateToken, (req, res) => {
     db.get('SELECT is_admin FROM users WHERE id = ?', [req.user.id], (err, user) => {
         if (err || !user || !user.is_admin) return res.status(403).json({ error: 'Acesso Negado' });
 
-        db.all('SELECT id, email, plan_status, trial_used, trial_time_used, pro_expires_at, created_at FROM users', [], (err, users) => {
-            if (err) return res.status(500).json({ error: 'Erro ao buscar usuários' });
-            
-            db.all('SELECT * FROM payments', [], (err, payments) => {
-                if (err) return res.status(500).json({ error: 'Erro ao buscar pagamentos' });
-
-                const totalUsers = users.length;
-                const activeAccounts = users.filter(u => u.plan_status !== 'free_trial').length;
-                const trialAccounts = users.filter(u => u.plan_status === 'free_trial').length;
-                const totalRevenue = payments.filter(p => p.status === 'COMPLETED').reduce((acc, p) => acc + p.amount, 0) / 100; // in BRL maybe?
-
-                res.json({
-                    totalUsers,
-                    activeAccounts,
-                    trialAccounts,
-                    totalRevenue,
-                    activeConnections: activeConnections.size,
-                    users,
-                    payments
+        db.get('SELECT COUNT(*) as total FROM users', (err, row1) => {
+            const totalUsers = row1 ? row1.total : 0;
+            db.get('SELECT COUNT(*) as active FROM users WHERE plan_status != "free_trial"', (err, row2) => {
+                const activeAccounts = row2 ? row2.active : 0;
+                db.get('SELECT COUNT(*) as trial FROM users WHERE plan_status = "free_trial"', (err, row3) => {
+                    const trialAccounts = row3 ? row3.trial : 0;
+                    db.get('SELECT SUM(amount) as totalRevenue FROM payments WHERE status = "COMPLETED"', (err, row4) => {
+                        const totalRevenue = (row4 && row4.totalRevenue ? row4.totalRevenue : 0) / 100;
+                        db.all('SELECT created_at FROM users', (err, usersData) => {
+                            res.json({
+                                totalUsers,
+                                activeAccounts,
+                                trialAccounts,
+                                totalRevenue,
+                                activeConnections: activeConnections.size,
+                                chartData: usersData || []
+                            });
+                        });
+                    });
                 });
+            });
+        });
+    });
+});
+
+app.get('/api/admin/users', authenticateToken, (req, res) => {
+    db.get('SELECT is_admin FROM users WHERE id = ?', [req.user.id], (err, user) => {
+        if (err || !user || !user.is_admin) return res.status(403).json({ error: 'Acesso Negado' });
+
+        const { page = 1, limit = 10, status, startDate, endDate } = req.query;
+        const offset = (page - 1) * limit;
+        
+        let query = 'SELECT id, email, plan_status, trial_used, trial_time_used, pro_expires_at, created_at FROM users WHERE 1=1';
+        let countQuery = 'SELECT COUNT(*) as total FROM users WHERE 1=1';
+        const params = [];
+        
+        if (status && status !== 'all') {
+            if (status === 'trial') {
+                query += ' AND plan_status = "free_trial"';
+                countQuery += ' AND plan_status = "free_trial"';
+            } else if (status === 'pro') {
+                query += ' AND plan_status = "pro"';
+                countQuery += ' AND plan_status = "pro"';
+            }
+        }
+        
+        if (startDate) {
+            query += ' AND created_at >= ?';
+            countQuery += ' AND created_at >= ?';
+            params.push(`${startDate} 00:00:00`);
+        }
+        
+        if (endDate) {
+            query += ' AND created_at <= ?';
+            countQuery += ' AND created_at <= ?';
+            params.push(`${endDate} 23:59:59`);
+        }
+        
+        query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+        
+        db.get(countQuery, params, (err, countRow) => {
+            if (err) return res.status(500).json({ error: 'Erro ao contar usuários' });
+            
+            const total = countRow.total;
+            const paginationParams = [...params, limit, offset];
+            
+            db.all(query, paginationParams, (err, users) => {
+                if (err) return res.status(500).json({ error: 'Erro ao buscar usuários' });
+                res.json({ users, total, page: parseInt(page), limit: parseInt(limit) });
+            });
+        });
+    });
+});
+
+app.get('/api/admin/payments', authenticateToken, (req, res) => {
+    db.get('SELECT is_admin FROM users WHERE id = ?', [req.user.id], (err, user) => {
+        if (err || !user || !user.is_admin) return res.status(403).json({ error: 'Acesso Negado' });
+
+        const { page = 1, limit = 10, status, startDate, endDate } = req.query;
+        const offset = (page - 1) * limit;
+        
+        let query = 'SELECT payments.*, users.email FROM payments LEFT JOIN users ON payments.user_id = users.id WHERE 1=1';
+        let countQuery = 'SELECT COUNT(*) as total FROM payments WHERE 1=1';
+        const params = [];
+        
+        if (status && status !== 'all') {
+            query += ' AND status = ?';
+            countQuery += ' AND status = ?';
+            params.push(status);
+        }
+        
+        if (startDate) {
+            query += ' AND payments.created_at >= ?';
+            countQuery += ' AND payments.created_at >= ?';
+            params.push(`${startDate} 00:00:00`);
+        }
+        
+        if (endDate) {
+            query += ' AND payments.created_at <= ?';
+            countQuery += ' AND payments.created_at <= ?';
+            params.push(`${endDate} 23:59:59`);
+        }
+        
+        query += ' ORDER BY payments.created_at DESC LIMIT ? OFFSET ?';
+        
+        db.get(countQuery, params, (err, countRow) => {
+            if (err) return res.status(500).json({ error: 'Erro ao contar pagamentos' });
+            
+            const total = countRow.total;
+            const paginationParams = [...params, limit, offset];
+            
+            db.all(query, paginationParams, (err, payments) => {
+                if (err) return res.status(500).json({ error: 'Erro ao buscar pagamentos' });
+                res.json({ payments, total, page: parseInt(page), limit: parseInt(limit) });
             });
         });
     });

@@ -1,93 +1,150 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { API_BASE_URL } from './config';
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  
+  const navigate = useNavigate();
+  const location = useLocation();
+  const pathParts = location.pathname.split('/');
+  const activeTab = pathParts[2] || 'overview';
+
   // Modal & Toast states
   const [modalOpen, setModalOpen] = useState(false);
   const [modalUserId, setModalUserId] = useState(null);
   const [modalMinutes, setModalMinutes] = useState('60');
   const [toastMsg, setToastMsg] = useState(null);
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  // General Stats
+  const [stats, setStats] = useState(null);
+  const [loadingStats, setLoadingStats] = useState(true);
 
-  // Derivar a aba atual a partir da URL
-  const pathParts = location.pathname.split('/');
-  const activeTab = pathParts[2] || 'overview';
+  // Filters Date Defaults (Current Month)
+  const now = new Date();
+  const defaultStartDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+  const defaultEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+
+  // Users State
+  const [users, setUsers] = useState([]);
+  const [usersTotal, setUsersTotal] = useState(0);
+  const [usersPage, setUsersPage] = useState(1);
+  const [usersLimit] = useState(10);
+  const [usersStatus, setUsersStatus] = useState('all');
+  const [usersStart, setUsersStart] = useState(defaultStartDate);
+  const [usersEnd, setUsersEnd] = useState(defaultEndDate);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+
+  // Payments State
+  const [payments, setPayments] = useState([]);
+  const [paymentsTotal, setPaymentsTotal] = useState(0);
+  const [paymentsPage, setPaymentsPage] = useState(1);
+  const [paymentsLimit] = useState(10);
+  const [paymentsStatus, setPaymentsStatus] = useState('all');
+  const [paymentsStart, setPaymentsStart] = useState(defaultStartDate);
+  const [paymentsEnd, setPaymentsEnd] = useState(defaultEndDate);
+  const [loadingPayments, setLoadingPayments] = useState(false);
+
+  // Subscriptions State
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [subsTotal, setSubsTotal] = useState(0);
+  const [subsPage, setSubsPage] = useState(1);
+  const [subsLimit] = useState(10);
+  const [loadingSubs, setLoadingSubs] = useState(false);
 
   const showToast = (msg, type = 'success') => {
     setToastMsg({ msg, type });
     setTimeout(() => setToastMsg(null), 4000);
   };
 
+  const getToken = () => localStorage.getItem('token');
+
+  // Fetch Overview Stats
   useEffect(() => {
     const fetchStats = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
+      const token = getToken();
+      if (!token) return navigate('/login');
       try {
-        const response = await fetch(`${API_BASE_URL}/api/admin/stats`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!response.ok) {
-          if (response.status === 403) {
-            navigate('/dashboard');
-          } else {
-            throw new Error('Falha ao carregar estatísticas');
-          }
-        } else {
-          const data = await response.json();
-          setStats(data);
+        const res = await fetch(`${API_BASE_URL}/api/admin/stats`, { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!res.ok) {
+          if (res.status === 403) navigate('/dashboard');
+          return;
         }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+        setStats(await res.json());
+      } catch (e) {} finally { setLoadingStats(false); }
     };
+    if (activeTab === 'overview') fetchStats();
+  }, [activeTab, navigate]);
 
-    fetchStats();
-  }, [navigate]);
+  // Fetch Users
+  const fetchUsers = useCallback(async () => {
+    setLoadingUsers(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/users?page=${usersPage}&limit=${usersLimit}&status=${usersStatus}&startDate=${usersStart}&endDate=${usersEnd}`, {
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data.users);
+        setUsersTotal(data.total);
+      }
+    } catch (e) {} finally { setLoadingUsers(false); }
+  }, [usersPage, usersLimit, usersStatus, usersStart, usersEnd]);
 
-  const openTrialModal = (userId) => {
-    setModalUserId(userId);
-    setModalMinutes('60');
-    setModalOpen(true);
-  };
+  useEffect(() => {
+    if (activeTab === 'users') fetchUsers();
+  }, [activeTab, fetchUsers]);
+
+  // Fetch Payments
+  const fetchPayments = useCallback(async () => {
+    setLoadingPayments(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/payments?page=${paymentsPage}&limit=${paymentsLimit}&status=${paymentsStatus}&startDate=${paymentsStart}&endDate=${paymentsEnd}`, {
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPayments(data.payments);
+        setPaymentsTotal(data.total);
+      }
+    } catch (e) {} finally { setLoadingPayments(false); }
+  }, [paymentsPage, paymentsLimit, paymentsStatus, paymentsStart, paymentsEnd]);
+
+  useEffect(() => {
+    if (activeTab === 'finance') fetchPayments();
+  }, [activeTab, fetchPayments]);
+
+  // Fetch Subscriptions (Users with PRO status)
+  const fetchSubscriptions = useCallback(async () => {
+    setLoadingSubs(true);
+    try {
+      // Reusing users endpoint but locking status=pro
+      const res = await fetch(`${API_BASE_URL}/api/admin/users?page=${subsPage}&limit=${subsLimit}&status=pro`, {
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSubscriptions(data.users);
+        setSubsTotal(data.total);
+      }
+    } catch (e) {} finally { setLoadingSubs(false); }
+  }, [subsPage, subsLimit]);
+
+  useEffect(() => {
+    if (activeTab === 'subscriptions') fetchSubscriptions();
+  }, [activeTab, fetchSubscriptions]);
 
   const submitAddTrial = async () => {
     if (!modalMinutes || isNaN(modalMinutes)) return;
     setModalOpen(false);
-
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/admin/add-trial`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/add-trial`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
         body: JSON.stringify({ userId: modalUserId, minutes: parseInt(modalMinutes) })
       });
-
-      if (response.ok) {
+      if (res.ok) {
         showToast('Tempo adicionado com sucesso!', 'success');
-        const refreshResponse = await fetch(`${API_BASE_URL}/api/admin/stats`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (refreshResponse.ok) {
-          setStats(await refreshResponse.json());
-        }
+        if (activeTab === 'users') fetchUsers();
       } else {
         showToast('Falha ao adicionar tempo.', 'error');
       }
@@ -96,12 +153,22 @@ export default function AdminDashboard() {
     }
   };
 
-  if (loading) return <div className="loading-screen">Carregando painel admin...</div>;
-  if (error) return <div className="error-message">{error}</div>;
-  if (!stats) return null;
+  const renderPagination = (page, total, limit, setPage) => {
+    const totalPages = Math.ceil(total / limit) || 1;
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
+        <button className="btn-secondary" disabled={page <= 1} onClick={() => setPage(page - 1)}>Anterior</button>
+        <span style={{color: '#fff'}}>Página {page} de {totalPages}</span>
+        <button className="btn-secondary" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Próxima</button>
+      </div>
+    );
+  };
 
   const renderOverview = () => {
-    const monthlyData = stats.users.reduce((acc, user) => {
+    if (loadingStats) return <div className="loading-screen">Carregando painel admin...</div>;
+    if (!stats) return null;
+    
+    const monthlyData = (stats.chartData || []).reduce((acc, user) => {
       const month = new Date(user.created_at).toLocaleString('pt-BR', { month: 'short' });
       const existing = acc.find(item => item.name === month);
       if (existing) {
@@ -133,7 +200,7 @@ export default function AdminDashboard() {
           </div>
           <div className="stat-card">
             <h3>Faturamento Total</h3>
-            <p className="stat-value">R$ {stats.totalRevenue.toFixed(2)}</p>
+            <p className="stat-value">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalRevenue)}</p>
           </div>
         </div>
 
@@ -160,6 +227,26 @@ export default function AdminDashboard() {
   const renderUsers = () => (
     <div className="admin-users" style={{ marginTop: '2rem' }}>
       <h2>Gestão de Usuários</h2>
+      
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <div className="input-group" style={{flex: 1}}>
+          <label>Status</label>
+          <select value={usersStatus} onChange={e => {setUsersStatus(e.target.value); setUsersPage(1);}}>
+            <option value="all">Todos</option>
+            <option value="pro">Pro</option>
+            <option value="trial">Trial</option>
+          </select>
+        </div>
+        <div className="input-group" style={{flex: 1}}>
+          <label>Data Início</label>
+          <input type="date" value={usersStart} onChange={e => {setUsersStart(e.target.value); setUsersPage(1);}} />
+        </div>
+        <div className="input-group" style={{flex: 1}}>
+          <label>Data Fim</label>
+          <input type="date" value={usersEnd} onChange={e => {setUsersEnd(e.target.value); setUsersPage(1);}} />
+        </div>
+      </div>
+
       <div className="table-responsive">
         <table className="admin-table">
           <thead>
@@ -168,12 +255,14 @@ export default function AdminDashboard() {
               <th>Email</th>
               <th>Status</th>
               <th>Criado em</th>
-              <th>Trial Usado (ms)</th>
+              <th>Trial Usado (min)</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
-            {stats.users.map(user => (
+            {loadingUsers ? <tr><td colSpan="6" style={{textAlign:'center'}}>Carregando...</td></tr> : 
+            users.length === 0 ? <tr><td colSpan="6" style={{textAlign:'center'}}>Nenhum usuário encontrado.</td></tr> :
+            users.map(user => (
               <tr key={user.id}>
                 <td>{user.id}</td>
                 <td>{user.email}</td>
@@ -183,9 +272,9 @@ export default function AdminDashboard() {
                   </span>
                 </td>
                 <td>{new Date(user.created_at).toLocaleDateString('pt-BR')}</td>
-                <td>{user.trial_time_used} ms</td>
+                <td>{Math.floor((user.trial_time_used || 0) / 60000)} min</td>
                 <td>
-                  <button className="btn-small btn-action" onClick={() => openTrialModal(user.id)}>
+                  <button className="btn-small btn-action" onClick={() => { setModalUserId(user.id); setModalMinutes('60'); setModalOpen(true); }}>
                     + Tempo de Trial
                   </button>
                 </td>
@@ -194,71 +283,94 @@ export default function AdminDashboard() {
           </tbody>
         </table>
       </div>
+      {!loadingUsers && renderPagination(usersPage, usersTotal, usersLimit, setUsersPage)}
     </div>
   );
 
-  const renderSubscriptions = () => {
-    return (
-      <div className="admin-users" style={{ marginTop: '2rem' }}>
-        <h2>Assinaturas e Planos Pro</h2>
-        <div className="table-responsive">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Usuário ID</th>
-                <th>Email</th>
-                <th>Status da Assinatura</th>
-                <th>Expira em</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.users.filter(u => u.plan_status === 'pro').map(user => {
-                const expiresAt = user.pro_expires_at ? new Date(user.pro_expires_at) : null;
-                const now = new Date();
-                let statusColor = '#10b981'; // green
-                let statusText = 'Ativa';
+  const renderSubscriptions = () => (
+    <div className="admin-users" style={{ marginTop: '2rem' }}>
+      <h2>Assinaturas e Planos Pro</h2>
+      <div className="table-responsive">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Usuário ID</th>
+              <th>Email</th>
+              <th>Status da Assinatura</th>
+              <th>Expira em</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loadingSubs ? <tr><td colSpan="4" style={{textAlign:'center'}}>Carregando...</td></tr> : 
+            subscriptions.length === 0 ? <tr><td colSpan="4" style={{textAlign:'center'}}>Nenhuma assinatura encontrada.</td></tr> :
+            subscriptions.map(user => {
+              const expiresAt = user.pro_expires_at ? new Date(user.pro_expires_at) : null;
+              const now = new Date();
+              let statusColor = '#10b981';
+              let statusText = 'Ativa';
 
-                if (expiresAt) {
-                  const daysDiff = (expiresAt - now) / (1000 * 60 * 60 * 24);
-                  if (daysDiff < 0) {
-                    statusColor = '#ef4444'; // red
-                    statusText = 'Vencida';
-                  } else if (daysDiff <= 7) {
-                    statusColor = '#f59e0b'; // yellow
-                    statusText = 'A Vencer';
-                  }
-                } else {
-                  statusText = 'Sem data de exp.';
+              if (expiresAt) {
+                const daysDiff = (expiresAt - now) / (1000 * 60 * 60 * 24);
+                if (daysDiff < 0) {
+                  statusColor = '#ef4444';
+                  statusText = 'Vencida';
+                } else if (daysDiff <= 7) {
+                  statusColor = '#f59e0b';
+                  statusText = 'A Vencer';
                 }
+              } else {
+                statusText = 'Sem data de exp.';
+              }
 
-                return (
-                  <tr key={user.id}>
-                    <td>{user.id}</td>
-                    <td>{user.email}</td>
-                    <td>
-                      <span className="status-badge" style={{ backgroundColor: statusColor }}>
-                        {statusText}
-                      </span>
-                    </td>
-                    <td>{expiresAt ? expiresAt.toLocaleDateString('pt-BR') : '-'}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+              return (
+                <tr key={user.id}>
+                  <td>{user.id}</td>
+                  <td>{user.email}</td>
+                  <td>
+                    <span className="status-badge" style={{ backgroundColor: statusColor }}>
+                      {statusText}
+                    </span>
+                  </td>
+                  <td>{expiresAt ? expiresAt.toLocaleDateString('pt-BR') : '-'}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-    );
-  };
+      {!loadingSubs && renderPagination(subsPage, subsTotal, subsLimit, setSubsPage)}
+    </div>
+  );
 
   const renderFinance = () => (
     <div className="admin-users" style={{ marginTop: '2rem' }}>
       <h2>Relatório Financeiro</h2>
+      
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <div className="input-group" style={{flex: 1}}>
+          <label>Status</label>
+          <select value={paymentsStatus} onChange={e => {setPaymentsStatus(e.target.value); setPaymentsPage(1);}}>
+            <option value="all">Todos</option>
+            <option value="COMPLETED">Aprovado</option>
+            <option value="PENDING">Pendente</option>
+          </select>
+        </div>
+        <div className="input-group" style={{flex: 1}}>
+          <label>Data Início</label>
+          <input type="date" value={paymentsStart} onChange={e => {setPaymentsStart(e.target.value); setPaymentsPage(1);}} />
+        </div>
+        <div className="input-group" style={{flex: 1}}>
+          <label>Data Fim</label>
+          <input type="date" value={paymentsEnd} onChange={e => {setPaymentsEnd(e.target.value); setPaymentsPage(1);}} />
+        </div>
+      </div>
+
       <div className="table-responsive">
         <table className="admin-table">
           <thead>
             <tr>
               <th>ID Cobrança</th>
+              <th>Usuário</th>
               <th>Status</th>
               <th>Valor (R$)</th>
               <th>Duração (Dias)</th>
@@ -266,15 +378,18 @@ export default function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {stats.payments.map(payment => (
+            {loadingPayments ? <tr><td colSpan="6" style={{textAlign:'center'}}>Carregando...</td></tr> : 
+            payments.length === 0 ? <tr><td colSpan="6" style={{textAlign:'center'}}>Nenhum pagamento encontrado.</td></tr> :
+            payments.map(payment => (
               <tr key={payment.id}>
                 <td>...{payment.charge_id.substring(payment.charge_id.length - 8)}</td>
+                <td>{payment.email || `ID: ${payment.user_id}`}</td>
                 <td>
                   <span className={`status-badge ${payment.status === 'COMPLETED' ? 'pro' : 'trial'}`}>
                     {payment.status}
                   </span>
                 </td>
-                <td>{(payment.amount / 100).toFixed(2)}</td>
+                <td>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(payment.amount / 100)}</td>
                 <td>{payment.plan_duration || 30}</td>
                 <td>{new Date(payment.created_at).toLocaleDateString('pt-BR')}</td>
               </tr>
@@ -282,6 +397,7 @@ export default function AdminDashboard() {
           </tbody>
         </table>
       </div>
+      {!loadingPayments && renderPagination(paymentsPage, paymentsTotal, paymentsLimit, setPaymentsPage)}
     </div>
   );
 
@@ -342,7 +458,6 @@ export default function AdminDashboard() {
         {activeTab === 'subscriptions' && renderSubscriptions()}
         {activeTab === 'finance' && renderFinance()}
 
-        {/* Modern Modal for Trial Time */}
         {modalOpen && (
           <div className="modal-overlay" style={{
             position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -376,7 +491,6 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Modern Toast Notification */}
         {toastMsg && (
           <div className={`toast-notification ${toastMsg.type}`} style={{
             position: 'fixed', bottom: '20px', right: '20px',
