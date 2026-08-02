@@ -1,0 +1,38 @@
+name: Deploy to CloudPanel
+
+on:
+  push:
+    branches:
+      - main # O deploy vai rodar quando você fizer push nesta branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script: |
+            # Entra na pasta do seu site
+            cd htdocs/live.paginasturbinadas.com.br
+            
+            # Verifica se já é um repositório git. Se não for, inicializa.
+            if [ ! -d ".git" ]; then
+              git init
+              git remote add origin https://github.com/John-Henrique/tiktok-live.git
+              git fetch
+              git reset --hard origin/main
+            else
+              # Se já for, apenas puxa o código mais recente
+              git pull origin main
+            fi
+            
+            # Instala as dependências novas (se houver)
+            npm install
+            
+            # O CloudPanel usa PM2 para rodar aplicações Node.js. 
+            pm2 restart all || echo "PM2 restart falhou, possivelmente não configurado ainda. Ignore."

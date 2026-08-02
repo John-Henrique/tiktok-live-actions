@@ -1,0 +1,34 @@
+# Dependências do Node.js (Gera muito volume e deve ser baixado com npm install)
+node_modules/
+
+# Variáveis de Ambiente (NUNCA envie para o GitHub, contém chaves secretas, senhas de banco, etc)
+.env
+.env.*
+
+# Banco de Dados SQLite (Contém dados dos usuários, compras, logs. Não deve ir pro GitHub)
+backend-engine/data/*.db
+backend-engine/data/*.sqlite
+backend-engine/database.sqlite
+
+# Builds e Compilados (Podem ser gerados localmente e ocupam muito espaço)
+desktop-client/dist/
+web-dashboard/dist/
+web-dashboard/build/
+
+# Ferramentas e executáveis baixados/criados dinamicamente
+desktop-client/rcedit.exe
+desktop-client/TikTokLiveActions.exe
+desktop-client/patch-icon.js
+
+# Logs e arquivos de debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Arquivos temporários do Sistema Operacional
+.DS_Store
+Thumbs.db
+backend-engine/data/saas.db
+backend-engine/data/saas.db
+backend-engine/data/saas.db

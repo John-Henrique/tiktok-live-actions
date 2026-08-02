@@ -1,0 +1,31 @@
+{
+  "name": "desktop-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node client.js",
+    "build": "pkg client.js --targets node18-win-x64 --output dist/TikTokLiveActions.exe",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@nut-tree-fork/nut-js": "^4.2.6",
+    "rcedit": "^5.0.2",
+    "socket.io-client": "^4.8.3"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1",
+    "resedit": "^3.0.2"
+  },
+  "pkg": {
+    "scripts": "client.js",
+    "assets": [
+      "node_modules/@nut-tree-fork/**/*",
+      "node_modules/**/*.node"
+    ]
+  }
+}

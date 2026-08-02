@@ -1,0 +1,1168 @@
+{
+  "common": {
+    "method": "WebcastGiftMessage",
+    "msgId": "7669186404476406548",
+    "roomId": "7669170135053617940",
+    "createTime": "1785621716143",
+    "monitor": 0,
+    "isShowMsg": true,
+    "describe": "NWACHUKWU: gifted the host 1 Rosa",
+    "displayText": {
+      "key": "webcast_aweme_gift_send_messageNew",
+      "defaultPattern": "{0:user} sent {1:gift} × {2:string}",
+      "defaultFormat": {
+        "color": "#ffface15",
+        "bold": false,
+        "italic": false,
+        "weight": 400,
+        "italicAngle": 0,
+        "fontSize": 0,
+        "useHeighLightColor": false,
+        "useRemoteClor": false
+      },
+      "pieces": [
+        {
+          "type": 11,
+          "format": {
+            "color": "#ff8ce7ff",
+            "bold": false,
+            "italic": false,
+            "weight": 400,
+            "italicAngle": 0,
+            "fontSize": 0,
+            "useHeighLightColor": false,
+            "useRemoteClor": false
+          },
+          "stringValue": "",
+          "userValue": {
+            "user": {
+              "id": "99880363790831616",
+              "deprecated1": "0",
+              "nickname": "NWACHUKWU",
+              "deprecated2": 0,
+              "bioDescription": "",
+              "deprecated3": 0,
+              "deprecated4": "0",
+              "deprecated5": "",
+              "avatarThumb": {
+                "urlList": [
+                  "https://p16-common-sign.tiktokcdn.com/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7~tplv-tiktokx-cropcenter:100:100.webp?dr=14579&refresh_token=5d1bc3ad&x-expires=1785794400&x-signature=0K%2F%2BKfjsmr0m2uBt6BE6XvJijb8%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=fdd36af4&idc=my2",
+                  "https://p19-common-sign.tiktokcdn.com/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7~tplv-tiktokx-cropcenter:100:100.webp?dr=14579&refresh_token=7154d651&x-expires=1785794400&x-signature=AupCcdFhiA9r9HCulNxFhD7m%2BHc%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=fdd36af4&idc=my2",
+                  "https://p16-common-sign.tiktokcdn.com/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7~tplv-tiktokx-cropcenter:100:100.jpeg?dr=14579&refresh_token=3397fd8c&x-expires=1785794400&x-signature=eNu4btzfuwBmFCd%2BCygomB0FL8Q%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=fdd36af4&idc=my2",
+                  "https://p16-common-sign.tiktokcdn-us.com/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7~tplv-tiktokx-cropcenter:100:100.webp?dr=18067&refresh_token=8268ace9&x-expires=1785794400&x-signature=yaKt54Gu6jjTGjlLIQe4sKk2NvY%3D&t=4d5b0474&ps=ae600521&shp=a5d48078&shcp=fdd36af4&idc=my2",
+                  "https://p19-common-sign.tiktokcdn-us.com/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7~tplv-tiktokx-cropcenter:100:100.webp?dr=18067&refresh_token=c9677d0d&x-expires=1785794400&x-signature=L4GTE4VBZoaPO0zALERuFbV0Wxc%3D&t=4d5b0474&ps=ae600521&shp=a5d48078&shcp=fdd36af4&idc=my2",
+                  "https://p16-common-sign.tiktokcdn-us.com/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7~tplv-tiktokx-cropcenter:100:100.jpeg?dr=18067&refresh_token=b8d8e15e&x-expires=1785794400&x-signature=Evm2dy2%2Bohs3dQCD27gORIV2DII%3D&t=4d5b0474&ps=ae600521&shp=a5d48078&shcp=fdd36af4&idc=my2"
+                ],
+                "uri": "100x100/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7",
+                "height": 0,
+                "width": 0,
+                "avgColor": "",
+                "imageType": 0,
+                "openWebUrl": "",
+                "isAnimated": false
+              },
+              "verified": false,
+              "deprecated6": 0,
+              "deprecated7": "",
+              "status": 0,
+              "createTime": "0",
+              "modifyTime": "0",
+              "secret": 0,
+              "shareQrcodeUri": "",
+              "deprecated8": 0,
+              "badgeImageList": [
+                {
+                  "urlList": [
+                    "https://p16-webcast.tiktokcdn.com/webcast-sg/new_top_gifter_version_2.png~tplv-obj.image",
+                    "https://p19-webcast.tiktokcdn.com/webcast-sg/new_top_gifter_version_2.png~tplv-obj.image"
+                  ],
+                  "uri": "webcast-sg/new_top_gifter_version_2.png",
+                  "height": 0,
+                  "width": 0,
+                  "avgColor": "",
+                  "imageType": 31,
+                  "openWebUrl": "",
+                  "isAnimated": false
+                }
+              ],
+              "followInfo": {
+                "followingCount": "2254",
+                "followerCount": "10110",
+                "followStatus": "0",
+                "pushStatus": "0"
+              },
+              "payGrade": {
+                "deprecated20": "0",
+                "name": "",
+                "nextName": "",
+                "level": 0,
+                "deprecated23": "0",
+                "deprecated24": "0",
+                "deprecated25": "0",
+                "gradeDescribe": "",
+                "gradeIconList": [],
+                "screenChatType": "0",
+                "upgradeNeedConsume": "0",
+                "nextPrivileges": "",
+                "score": "0",
+                "gradeBanner": ""
+              },
+              "specialId": "",
+              "realTimeIcons": [],
+              "newRealTimeIcons": [],
+              "topVipNo": 0,
+              "userAttr": {
+                "isMuted": false,
+                "isAdmin": false,
+                "isSuperAdmin": false,
+                "muteDuration": "0",
+                "adminPermissions": {},
+                "hasVotingFunction": false,
+                "isChannelAdmin": false
+              },
+              "payScore": "0",
+              "ticketCount": "0",
+              "linkMicStats": 0,
+              "displayId": "i_am_nwachukwu",
+              "withCommercePermission": false,
+              "withFusionShopEntry": false,
+              "deprecated21": "0",
+              "verifiedContent": "",
+              "topFans": [],
+              "secUid": "MS4wLjABAAAACaiUBw_et1fRlBsGDCCjifr7orAaHVrjhZ5KpnG2nkc9bQmr6yp86LdMj-nApPkO",
+              "userRole": 0,
+              "deprecated9": {
+                "type": "Buffer",
+                "data": []
+              },
+              "deprecated10": {
+                "type": "Buffer",
+                "data": []
+              },
+              "deprecated11": {
+                "type": "Buffer",
+                "data": []
+              },
+              "deprecated12": 0,
+              "deprecated13": 0,
+              "deprecated14": {
+                "type": "Buffer",
+                "data": []
+              },
+              "mediaBadgeImageList": [],
+              "deprecated15": 0,
+              "userVipInfo": {
+                "type": "Buffer",
+                "data": []
+              },
+              "commerceWebcastConfigIds": [],
+              "borderList": [],
+              "badgeList": [
+                {
+                  "displayType": 1,
+                  "priorityType": 50,
+                  "sceneType": 6,
+                  "position": 2,
+                  "displayStatus": 0,
+                  "greyedByClient": "0",
+                  "exhibitionType": 0,
+                  "openweburl": "",
+                  "display": false,
+                  "privilegeLogExtra": {
+                    "dataVersion": "0",
+                    "privilegeId": "0",
+                    "privilegeVersion": "0",
+                    "privilegeOrderId": "",
+                    "level": "0",
+                    "startTime": "0",
+                    "endTime": "0"
+                  },
+                  "image": {
+                    "displayType": 1,
+                    "image": {
+                      "urlList": [
+                        "https://p16-webcast.tiktokcdn.com/webcast-sg/new_top_gifter_version_2.png~tplv-obj.image",
+                        "https://p19-webcast.tiktokcdn.com/webcast-sg/new_top_gifter_version_2.png~tplv-obj.image"
+                      ],
+                      "uri": "webcast-sg/new_top_gifter_version_2.png",
+                      "height": 0,
+                      "width": 0,
+                      "avgColor": "",
+                      "imageType": 31,
+                      "openWebUrl": "",
+                      "isAnimated": false
+                    }
+                  },
+                  "isCustomized": false
+                },
+                {
+                  "displayType": 4,
+                  "priorityType": 20,
+                  "sceneType": 8,
+                  "position": 1,
+                  "displayStatus": 0,
+                  "greyedByClient": "0",
+                  "exhibitionType": 0,
+                  "openweburl": "aweme://roma_redirect/?spark_page=user_level_main_page_privilege_panel",
+                  "display": true,
+                  "privilegeLogExtra": {
+                    "dataVersion": "2",
+                    "privilegeId": "7138381861675341604",
+                    "privilegeVersion": "0",
+                    "privilegeOrderId": "mock_fix_width_transparent_7138381861675341604",
+                    "level": "21",
+                    "startTime": "0",
+                    "endTime": "0"
+                  },
+                  "combine": {
+                    "displayType": 4,
+                    "icon": {
+                      "urlList": [
+                        "https://p16-webcast.tiktokcdn.com/webcast-va/grade_badge_icon_lite_lv20_v1.png~tplv-obj.image",
+                        "https://p19-webcast.tiktokcdn.com/webcast-va/grade_badge_icon_lite_lv20_v1.png~tplv-obj.image"
+                      ],
+                      "uri": "webcast-va/grade_badge_icon_lite_lv20_v1.png",
+                      "height": 0,
+                      "width": 0,
+                      "avgColor": "",
+                      "imageType": 0,
+                      "openWebUrl": "aweme://roma_redirect/?spark_page=user_level_main_page_privilege_panel",
+                      "isAnimated": false
+                    },
+                    "str": "21",
+                    "padding": {
+                      "useSpecific": true,
+                      "middlePadding": 0,
+                      "badgeWidth": 32,
+                      "leftPadding": 0,
+                      "rightPadding": 0,
+                      "iconTopPadding": 0,
+                      "iconBottomPadding": 0,
+                      "horizontalPaddingRule": 0,
+                      "verticalPaddingRule": 0
+                    },
+                    "fontStyle": {
+                      "fontSize": 0,
+                      "fontWidth": 0,
+                      "fontColor": "",
+                      "borderColor": ""
+                    },
+                    "profileCardPanel": {
+                      "useNewProfileCardStyle": false,
+                      "badgeTextPosition": 0,
+                      "projectionConfig": {
+                        "useProjection": false,
+                        "icon": {
+                          "urlList": [],
+                          "uri": "",
+                          "height": 0,
+                          "width": 0,
+                          "avgColor": "",
+                          "imageType": 0,
+                          "openWebUrl": "",
+                          "isAnimated": false
+                        }
+                      },
+                      "profileContent": {
+                        "useContent": false,
+                        "iconList": []
+                      }
+                    },
+                    "background": {
+                      "image": {
+                        "urlList": [],
+                        "uri": "",
+                        "height": 0,
+                        "width": 0,
+                        "avgColor": "",
+                        "imageType": 0,
+                        "openWebUrl": "",
+                        "isAnimated": false
+                      },
+                      "backgroundColorCode": "#B3475AFF",
+                      "borderColorCode": "",
+                      "leftSideImage": {
+                        "urlList": [],
+                        "uri": "",
+                        "height": 0,
+                        "width": 0,
+                        "avgColor": "",
+                        "imageType": 0,
+                        "openWebUrl": "",
+                        "isAnimated": false
+                      }
+                    },
+                    "backgroundDarkMode": {
+                      "image": {
+                        "urlList": [],
+                        "uri": "",
+                        "height": 0,
+                        "width": 0,
+                        "avgColor": "",
+                        "imageType": 0,
+                        "openWebUrl": "",
+                        "isAnimated": false
+                      },
+                      "backgroundColorCode": "#B3475AFF",
+                      "borderColorCode": "",
+                      "leftSideImage": {
+                        "urlList": [],
+                        "uri": "",
+                        "height": 0,
+                        "width": 0,
+                        "avgColor": "",
+                        "imageType": 0,
+                        "openWebUrl": "",
+                        "isAnimated": false
+                      }
+                    },
+                    "iconAutoMirrored": false,
+                    "backgroundAutoMirrored": false,
+                    "publicScreenShowStyle": 14,
+                    "personalCardShowStyle": 15,
+                    "ranklistOnlineAudienceShowStyle": 0,
+                    "multiGuestShowStyle": 0,
+                    "paddingNewFont": {
+                      "useSpecific": true,
+                      "middlePadding": 1,
+                      "badgeWidth": 32,
+                      "leftPadding": 0,
+                      "rightPadding": 0,
+                      "iconTopPadding": 0,
+                      "iconBottomPadding": 0,
+                      "horizontalPaddingRule": 0,
+                      "verticalPaddingRule": 0
+                    }
+                  },
+                  "isCustomized": false
+                },
+                {
+                  "displayType": 4,
+                  "priorityType": 50,
+                  "sceneType": 6,
+                  "position": 2,
+                  "displayStatus": 0,
+                  "greyedByClient": "0",
+                  "exhibitionType": 0,
+                  "openweburl": "sslocal://webcast_webview_popup?url=https%3A%2F%2Finapp.tiktokv.com%2Flive%2Fmonetization%2Franking%2Ftopview%2Ffaq-new&web_bg_color=FFFFFF&gravity=bottom&height=60%25&show_mask=1&mask_bg_color=000000b3&radius=8&use_spark=1&rank=1&score=20",
+                  "display": true,
+                  "privilegeLogExtra": {
+                    "dataVersion": "0",
+                    "privilegeId": "0",
+                    "privilegeVersion": "0",
+                    "privilegeOrderId": "",
+                    "level": "0",
+                    "startTime": "0",
+                    "endTime": "0"
+                  },
+                  "combine": {
+                    "displayType": 4,
+                    "icon": {
+                      "urlList": [
+                        "https://p16-webcast.tiktokcdn.com/webcast-sg/new_top_gifter_version_2.png~tplv-obj.image",
+                        "https://p19-webcast.tiktokcdn.com/webcast-sg/new_top_gifter_version_2.png~tplv-obj.image"
+                      ],
+                      "uri": "webcast-sg/new_top_gifter_version_2.png",
+                      "height": 0,
+                      "width": 0,
+                      "avgColor": "",
+                      "imageType": 31,
+                      "openWebUrl": "sslocal://webcast_webview_popup?url=https%3A%2F%2Finapp.tiktokv.com%2Flive%2Fmonetization%2Franking%2Ftopview%2Ffaq-new&web_bg_color=FFFFFF&gravity=bottom&height=60%25&show_mask=1&mask_bg_color=000000b3&radius=8&use_spark=1&rank=1&score=20",
+                      "isAnimated": false
+                    },
+                    "text": {
+                      "key": "pm_mt_badeg_notes_profile1",
+                      "defaultPattern": "No. 1",
+                      "pieces": []
+                    },
+                    "str": "",
+                    "background": {
+                      "image": {
+                        "urlList": [],
+                        "uri": "",
+                        "height": 0,
+                        "width": 0,
+                        "avgColor": "",
+                        "imageType": 0,
+                        "openWebUrl": "",
+                        "isAnimated": false
+                      },
+                      "backgroundColorCode": "#66FE2C55",
+                      "borderColorCode": "",
+                      "leftSideImage": {
+                        "urlList": [],
+                        "uri": "",
+                        "height": 0,
+                        "width": 0,
+                        "avgColor": "",
+                        "imageType": 0,
+                        "openWebUrl": "",
+                        "isAnimated": false
+                      }
+                    },
+                    "backgroundDarkMode": {
+                      "image": {
+                        "urlList": [],
+                        "uri": "",
+                        "height": 0,
+                        "width": 0,
+                        "avgColor": "",
+                        "imageType": 0,
+                        "openWebUrl": "",
+                        "isAnimated": false
+                      },
+                      "backgroundColorCode": "#66FE2C55",
+                      "borderColorCode": "",
+                      "leftSideImage": {
+                        "urlList": [],
+                        "uri": "",
+                        "height": 0,
+                        "width": 0,
+                        "avgColor": "",
+                        "imageType": 0,
+                        "openWebUrl": "",
+                        "isAnimated": false
+                      }
+                    },
+                    "iconAutoMirrored": false,
+                    "backgroundAutoMirrored": false,
+                    "publicScreenShowStyle": 14,
+                    "personalCardShowStyle": 15,
+                    "ranklistOnlineAudienceShowStyle": 14,
+                    "multiGuestShowStyle": 14
+                  },
+                  "isCustomized": false
+                }
+              ],
+              "mintTypeLabel": [],
+              "deprecated19": false,
+              "allowFindByContacts": false,
+              "allowOthersDownloadVideo": false,
+              "allowOthersDownloadWhenSharingVideo": false,
+              "allowShareShowProfile": false,
+              "allowShowInGossip": false,
+              "allowShowMyAction": false,
+              "allowStrangeComment": false,
+              "allowUnfollowerComment": false,
+              "allowUseLinkmic": false,
+              "bgImgUrl": "",
+              "deprecated18": "",
+              "deprecated16": false,
+              "blockStatus": 0,
+              "commentRestrict": 0,
+              "constellation": "",
+              "disableIchat": 0,
+              "enableIchatImg": "0",
+              "exp": 0,
+              "fanTicketCount": "0",
+              "foldStrangerChat": false,
+              "followStatus": "0",
+              "deprecated28": false,
+              "deprecated29": "",
+              "ichatRestrictType": 0,
+              "idStr": "",
+              "isFollower": false,
+              "isFollowing": false,
+              "needProfileGuide": false,
+              "payScores": "0",
+              "pushCommentStatus": false,
+              "pushDigg": false,
+              "pushFollow": false,
+              "pushFriendAction": false,
+              "pushIchat": false,
+              "pushStatus": false,
+              "pushVideoPost": false,
+              "pushVideoRecommend": false,
+              "stats": {
+                "type": "Buffer",
+                "data": []
+              },
+              "deprecated17": false,
+              "verifiedReason": "",
+              "withCarManagementPermission": false,
+              "upcomingEventList": [],
+              "scmLabel": "",
+              "isBlock": false,
+              "isSubscribe": false,
+              "isAnchorMarked": false,
+              "enigmaInfo": {
+                "isEnigmaMaskOn": false
+              }
+            },
+            "withColon": true
+          }
+        },
+        {
+          "type": 12,
+          "stringValue": "",
+          "giftValue": {
+            "giftId": "8913",
+            "nameRef": {
+              "key": "live_gift_8913",
+              "defaultPattern": "Rosa",
+              "keyGroups": {}
+            },
+            "showType": 0,
+            "colorId": "-1"
+          }
+        },
+        {
+          "type": 1,
+          "format": {
+            "color": "#ffface15",
+            "bold": false,
+            "italic": false,
+            "weight": 400,
+            "italicAngle": 0,
+            "fontSize": 0,
+            "useHeighLightColor": false,
+            "useRemoteClor": false
+          },
+          "stringValue": "1"
+        }
+      ]
+    },
+    "foldType": "1",
+    "anchorFoldType": "2",
+    "priorityScore": "1000",
+    "logId": "2026080206015229045DBF9AAB51F26362",
+    "msgProcessFilterK": "",
+    "msgProcessFilterV": "",
+    "fromIdc": "",
+    "toIdc": "",
+    "filterMsgTags": [],
+    "anchorPriorityScore": "1000",
+    "roomMessageHeatLevel": "3",
+    "foldTypeForWeb": "2",
+    "anchorFoldTypeForWeb": "2",
+    "clientSendTime": "0",
+    "dispatchStrategy": 0
+  },
+  "giftId": "8913",
+  "fanTicketCount": 0,
+  "groupCount": 1,
+  "repeatCount": 1,
+  "comboCount": 1,
+  "user": {
+    "id": "99880363790831616",
+    "deprecated1": "0",
+    "nickname": "NWACHUKWU",
+    "deprecated2": 0,
+    "bioDescription": "",
+    "deprecated3": 0,
+    "deprecated4": "0",
+    "deprecated5": "",
+    "avatarThumb": {
+      "urlList": [
+        "https://p16-common-sign.tiktokcdn.com/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7~tplv-tiktokx-cropcenter:100:100.webp?dr=14579&refresh_token=5d1bc3ad&x-expires=1785794400&x-signature=0K%2F%2BKfjsmr0m2uBt6BE6XvJijb8%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=fdd36af4&idc=my2",
+        "https://p19-common-sign.tiktokcdn.com/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7~tplv-tiktokx-cropcenter:100:100.webp?dr=14579&refresh_token=7154d651&x-expires=1785794400&x-signature=AupCcdFhiA9r9HCulNxFhD7m%2BHc%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=fdd36af4&idc=my2",
+        "https://p16-common-sign.tiktokcdn.com/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7~tplv-tiktokx-cropcenter:100:100.jpeg?dr=14579&refresh_token=3397fd8c&x-expires=1785794400&x-signature=eNu4btzfuwBmFCd%2BCygomB0FL8Q%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=fdd36af4&idc=my2",
+        "https://p16-common-sign.tiktokcdn-us.com/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7~tplv-tiktokx-cropcenter:100:100.webp?dr=18067&refresh_token=8268ace9&x-expires=1785794400&x-signature=yaKt54Gu6jjTGjlLIQe4sKk2NvY%3D&t=4d5b0474&ps=ae600521&shp=a5d48078&shcp=fdd36af4&idc=my2",
+        "https://p19-common-sign.tiktokcdn-us.com/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7~tplv-tiktokx-cropcenter:100:100.webp?dr=18067&refresh_token=c9677d0d&x-expires=1785794400&x-signature=L4GTE4VBZoaPO0zALERuFbV0Wxc%3D&t=4d5b0474&ps=ae600521&shp=a5d48078&shcp=fdd36af4&idc=my2",
+        "https://p16-common-sign.tiktokcdn-us.com/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7~tplv-tiktokx-cropcenter:100:100.jpeg?dr=18067&refresh_token=b8d8e15e&x-expires=1785794400&x-signature=Evm2dy2%2Bohs3dQCD27gORIV2DII%3D&t=4d5b0474&ps=ae600521&shp=a5d48078&shcp=fdd36af4&idc=my2"
+      ],
+      "uri": "100x100/tos-alisg-avt-0068/5f0378e0da00563cc0f232cc937b8fb7",
+      "height": 0,
+      "width": 0,
+      "avgColor": "",
+      "imageType": 0,
+      "openWebUrl": "",
+      "isAnimated": false
+    },
+    "verified": false,
+    "deprecated6": 0,
+    "deprecated7": "",
+    "status": 0,
+    "createTime": "0",
+    "modifyTime": "0",
+    "secret": 0,
+    "shareQrcodeUri": "",
+    "deprecated8": 0,
+    "badgeImageList": [
+      {
+        "urlList": [
+          "https://p16-webcast.tiktokcdn.com/webcast-sg/new_top_gifter_version_2.png~tplv-obj.image",
+          "https://p19-webcast.tiktokcdn.com/webcast-sg/new_top_gifter_version_2.png~tplv-obj.image"
+        ],
+        "uri": "webcast-sg/new_top_gifter_version_2.png",
+        "height": 0,
+        "width": 0,
+        "avgColor": "",
+        "imageType": 31,
+        "openWebUrl": "",
+        "isAnimated": false
+      }
+    ],
+    "followInfo": {
+      "followingCount": "2254",
+      "followerCount": "10110",
+      "followStatus": "0",
+      "pushStatus": "0"
+    },
+    "payGrade": {
+      "deprecated20": "0",
+      "name": "",
+      "nextName": "",
+      "level": 0,
+      "deprecated23": "0",
+      "deprecated24": "0",
+      "deprecated25": "0",
+      "gradeDescribe": "",
+      "gradeIconList": [],
+      "screenChatType": "0",
+      "upgradeNeedConsume": "0",
+      "nextPrivileges": "",
+      "score": "0",
+      "gradeBanner": ""
+    },
+    "specialId": "",
+    "realTimeIcons": [],
+    "newRealTimeIcons": [],
+    "topVipNo": 0,
+    "userAttr": {
+      "isMuted": false,
+      "isAdmin": false,
+      "isSuperAdmin": false,
+      "muteDuration": "0",
+      "adminPermissions": {},
+      "hasVotingFunction": false,
+      "isChannelAdmin": false
+    },
+    "payScore": "0",
+    "ticketCount": "0",
+    "linkMicStats": 0,
+    "displayId": "i_am_nwachukwu",
+    "withCommercePermission": false,
+    "withFusionShopEntry": false,
+    "deprecated21": "0",
+    "verifiedContent": "",
+    "topFans": [],
+    "secUid": "MS4wLjABAAAACaiUBw_et1fRlBsGDCCjifr7orAaHVrjhZ5KpnG2nkc9bQmr6yp86LdMj-nApPkO",
+    "userRole": 0,
+    "deprecated9": {
+      "type": "Buffer",
+      "data": []
+    },
+    "deprecated10": {
+      "type": "Buffer",
+      "data": []
+    },
+    "deprecated11": {
+      "type": "Buffer",
+      "data": []
+    },
+    "deprecated12": 0,
+    "deprecated13": 0,
+    "deprecated14": {
+      "type": "Buffer",
+      "data": []
+    },
+    "mediaBadgeImageList": [],
+    "deprecated15": 0,
+    "userVipInfo": {
+      "type": "Buffer",
+      "data": []
+    },
+    "commerceWebcastConfigIds": [],
+    "borderList": [],
+    "badgeList": [
+      {
+        "displayType": 1,
+        "priorityType": 50,
+        "sceneType": 6,
+        "position": 2,
+        "displayStatus": 0,
+        "greyedByClient": "0",
+        "exhibitionType": 0,
+        "openweburl": "",
+        "display": false,
+        "privilegeLogExtra": {
+          "dataVersion": "0",
+          "privilegeId": "0",
+          "privilegeVersion": "0",
+          "privilegeOrderId": "",
+          "level": "0",
+          "startTime": "0",
+          "endTime": "0"
+        },
+        "image": {
+          "displayType": 1,
+          "image": {
+            "urlList": [
+              "https://p16-webcast.tiktokcdn.com/webcast-sg/new_top_gifter_version_2.png~tplv-obj.image",
+              "https://p19-webcast.tiktokcdn.com/webcast-sg/new_top_gifter_version_2.png~tplv-obj.image"
+            ],
+            "uri": "webcast-sg/new_top_gifter_version_2.png",
+            "height": 0,
+            "width": 0,
+            "avgColor": "",
+            "imageType": 31,
+            "openWebUrl": "",
+            "isAnimated": false
+          }
+        },
+        "isCustomized": false
+      },
+      {
+        "displayType": 4,
+        "priorityType": 20,
+        "sceneType": 8,
+        "position": 1,
+        "displayStatus": 0,
+        "greyedByClient": "0",
+        "exhibitionType": 0,
+        "openweburl": "aweme://roma_redirect/?spark_page=user_level_main_page_privilege_panel",
+        "display": true,
+        "privilegeLogExtra": {
+          "dataVersion": "2",
+          "privilegeId": "7138381861675341604",
+          "privilegeVersion": "0",
+          "privilegeOrderId": "mock_fix_width_transparent_7138381861675341604",
+          "level": "21",
+          "startTime": "0",
+          "endTime": "0"
+        },
+        "combine": {
+          "displayType": 4,
+          "icon": {
+            "urlList": [
+              "https://p16-webcast.tiktokcdn.com/webcast-va/grade_badge_icon_lite_lv20_v1.png~tplv-obj.image",
+              "https://p19-webcast.tiktokcdn.com/webcast-va/grade_badge_icon_lite_lv20_v1.png~tplv-obj.image"
+            ],
+            "uri": "webcast-va/grade_badge_icon_lite_lv20_v1.png",
+            "height": 0,
+            "width": 0,
+            "avgColor": "",
+            "imageType": 0,
+            "openWebUrl": "aweme://roma_redirect/?spark_page=user_level_main_page_privilege_panel",
+            "isAnimated": false
+          },
+          "str": "21",
+          "padding": {
+            "useSpecific": true,
+            "middlePadding": 0,
+            "badgeWidth": 32,
+            "leftPadding": 0,
+            "rightPadding": 0,
+            "iconTopPadding": 0,
+            "iconBottomPadding": 0,
+            "horizontalPaddingRule": 0,
+            "verticalPaddingRule": 0
+          },
+          "fontStyle": {
+            "fontSize": 0,
+            "fontWidth": 0,
+            "fontColor": "",
+            "borderColor": ""
+          },
+          "profileCardPanel": {
+            "useNewProfileCardStyle": false,
+            "badgeTextPosition": 0,
+            "projectionConfig": {
+              "useProjection": false,
+              "icon": {
+                "urlList": [],
+                "uri": "",
+                "height": 0,
+                "width": 0,
+                "avgColor": "",
+                "imageType": 0,
+                "openWebUrl": "",
+                "isAnimated": false
+              }
+            },
+            "profileContent": {
+              "useContent": false,
+              "iconList": []
+            }
+          },
+          "background": {
+            "image": {
+              "urlList": [],
+              "uri": "",
+              "height": 0,
+              "width": 0,
+              "avgColor": "",
+              "imageType": 0,
+              "openWebUrl": "",
+              "isAnimated": false
+            },
+            "backgroundColorCode": "#B3475AFF",
+            "borderColorCode": "",
+            "leftSideImage": {
+              "urlList": [],
+              "uri": "",
+              "height": 0,
+              "width": 0,
+              "avgColor": "",
+              "imageType": 0,
+              "openWebUrl": "",
+              "isAnimated": false
+            }
+          },
+          "backgroundDarkMode": {
+            "image": {
+              "urlList": [],
+              "uri": "",
+              "height": 0,
+              "width": 0,
+              "avgColor": "",
+              "imageType": 0,
+              "openWebUrl": "",
+              "isAnimated": false
+            },
+            "backgroundColorCode": "#B3475AFF",
+            "borderColorCode": "",
+            "leftSideImage": {
+              "urlList": [],
+              "uri": "",
+              "height": 0,
+              "width": 0,
+              "avgColor": "",
+              "imageType": 0,
+              "openWebUrl": "",
+              "isAnimated": false
+            }
+          },
+          "iconAutoMirrored": false,
+          "backgroundAutoMirrored": false,
+          "publicScreenShowStyle": 14,
+          "personalCardShowStyle": 15,
+          "ranklistOnlineAudienceShowStyle": 0,
+          "multiGuestShowStyle": 0,
+          "paddingNewFont": {
+            "useSpecific": true,
+            "middlePadding": 1,
+            "badgeWidth": 32,
+            "leftPadding": 0,
+            "rightPadding": 0,
+            "iconTopPadding": 0,
+            "iconBottomPadding": 0,
+            "horizontalPaddingRule": 0,
+            "verticalPaddingRule": 0
+          }
+        },
+        "isCustomized": false
+      },
+      {
+        "displayType": 4,
+        "priorityType": 50,
+        "sceneType": 6,
+        "position": 2,
+        "displayStatus": 0,
+        "greyedByClient": "0",
+        "exhibitionType": 0,
+        "openweburl": "sslocal://webcast_webview_popup?url=https%3A%2F%2Finapp.tiktokv.com%2Flive%2Fmonetization%2Franking%2Ftopview%2Ffaq-new&web_bg_color=FFFFFF&gravity=bottom&height=60%25&show_mask=1&mask_bg_color=000000b3&radius=8&use_spark=1&rank=1&score=20",
+        "display": true,
+        "privilegeLogExtra": {
+          "dataVersion": "0",
+          "privilegeId": "0",
+          "privilegeVersion": "0",
+          "privilegeOrderId": "",
+          "level": "0",
+          "startTime": "0",
+          "endTime": "0"
+        },
+        "combine": {
+          "displayType": 4,
+          "icon": {
+            "urlList": [
+              "https://p16-webcast.tiktokcdn.com/webcast-sg/new_top_gifter_version_2.png~tplv-obj.image",
+              "https://p19-webcast.tiktokcdn.com/webcast-sg/new_top_gifter_version_2.png~tplv-obj.image"
+            ],
+            "uri": "webcast-sg/new_top_gifter_version_2.png",
+            "height": 0,
+            "width": 0,
+            "avgColor": "",
+            "imageType": 31,
+            "openWebUrl": "sslocal://webcast_webview_popup?url=https%3A%2F%2Finapp.tiktokv.com%2Flive%2Fmonetization%2Franking%2Ftopview%2Ffaq-new&web_bg_color=FFFFFF&gravity=bottom&height=60%25&show_mask=1&mask_bg_color=000000b3&radius=8&use_spark=1&rank=1&score=20",
+            "isAnimated": false
+          },
+          "text": {
+            "key": "pm_mt_badeg_notes_profile1",
+            "defaultPattern": "No. 1",
+            "pieces": []
+          },
+          "str": "",
+          "background": {
+            "image": {
+              "urlList": [],
+              "uri": "",
+              "height": 0,
+              "width": 0,
+              "avgColor": "",
+              "imageType": 0,
+              "openWebUrl": "",
+              "isAnimated": false
+            },
+            "backgroundColorCode": "#66FE2C55",
+            "borderColorCode": "",
+            "leftSideImage": {
+              "urlList": [],
+              "uri": "",
+              "height": 0,
+              "width": 0,
+              "avgColor": "",
+              "imageType": 0,
+              "openWebUrl": "",
+              "isAnimated": false
+            }
+          },
+          "backgroundDarkMode": {
+            "image": {
+              "urlList": [],
+              "uri": "",
+              "height": 0,
+              "width": 0,
+              "avgColor": "",
+              "imageType": 0,
+              "openWebUrl": "",
+              "isAnimated": false
+            },
+            "backgroundColorCode": "#66FE2C55",
+            "borderColorCode": "",
+            "leftSideImage": {
+              "urlList": [],
+              "uri": "",
+              "height": 0,
+              "width": 0,
+              "avgColor": "",
+              "imageType": 0,
+              "openWebUrl": "",
+              "isAnimated": false
+            }
+          },
+          "iconAutoMirrored": false,
+          "backgroundAutoMirrored": false,
+          "publicScreenShowStyle": 14,
+          "personalCardShowStyle": 15,
+          "ranklistOnlineAudienceShowStyle": 14,
+          "multiGuestShowStyle": 14
+        },
+        "isCustomized": false
+      }
+    ],
+    "mintTypeLabel": [],
+    "deprecated19": false,
+    "allowFindByContacts": false,
+    "allowOthersDownloadVideo": false,
+    "allowOthersDownloadWhenSharingVideo": false,
+    "allowShareShowProfile": false,
+    "allowShowInGossip": false,
+    "allowShowMyAction": false,
+    "allowStrangeComment": false,
+    "allowUnfollowerComment": false,
+    "allowUseLinkmic": false,
+    "bgImgUrl": "",
+    "deprecated18": "",
+    "deprecated16": false,
+    "blockStatus": 0,
+    "commentRestrict": 0,
+    "constellation": "",
+    "disableIchat": 0,
+    "enableIchatImg": "0",
+    "exp": 0,
+    "fanTicketCount": "0",
+    "foldStrangerChat": false,
+    "followStatus": "0",
+    "deprecated28": false,
+    "deprecated29": "",
+    "ichatRestrictType": 0,
+    "idStr": "99880363790831616",
+    "isFollower": false,
+    "isFollowing": false,
+    "needProfileGuide": false,
+    "payScores": "0",
+    "pushCommentStatus": false,
+    "pushDigg": false,
+    "pushFollow": false,
+    "pushFriendAction": false,
+    "pushIchat": false,
+    "pushStatus": false,
+    "pushVideoPost": false,
+    "pushVideoRecommend": false,
+    "stats": {
+      "type": "Buffer",
+      "data": []
+    },
+    "deprecated17": false,
+    "verifiedReason": "",
+    "withCarManagementPermission": false,
+    "upcomingEventList": [],
+    "scmLabel": "",
+    "isBlock": false,
+    "isSubscribe": false,
+    "isAnchorMarked": false,
+    "enigmaInfo": {
+      "isEnigmaMaskOn": false
+    }
+  },
+  "repeatEnd": 1,
+  "groupId": "1785621712500",
+  "incomeTaskgifts": "0",
+  "roomFanTicketCount": "0",
+  "priority": {
+    "queueSizes": [
+      "-1",
+      "-1",
+      "50",
+      "150"
+    ],
+    "selfQueuePriority": "1",
+    "priority": 3
+  },
+  "gift": {
+    "image": {
+      "urlList": [
+        "https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/eb77ead5c3abb6da6034d3cf6cfeb438~tplv-obj.png",
+        "https://p19-webcast.tiktokcdn.com/img/maliva/webcast-va/eb77ead5c3abb6da6034d3cf6cfeb438~tplv-obj.png"
+      ],
+      "uri": "webcast-va/eb77ead5c3abb6da6034d3cf6cfeb438",
+      "height": 0,
+      "width": 0,
+      "avgColor": "#B8B8B8",
+      "imageType": 0,
+      "openWebUrl": "",
+      "isAnimated": false
+    },
+    "describe": "Sent Rosa",
+    "duration": 1000,
+    "id": "8913",
+    "forLinkmic": true,
+    "combo": true,
+    "type": 1,
+    "diamondCount": 10,
+    "isDisplayedOnPanel": true,
+    "primaryEffectId": "0",
+    "name": "Rosa",
+    "icon": {
+      "urlList": [
+        "https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/eb77ead5c3abb6da6034d3cf6cfeb438~tplv-obj.png",
+        "https://p19-webcast.tiktokcdn.com/img/maliva/webcast-va/eb77ead5c3abb6da6034d3cf6cfeb438~tplv-obj.png"
+      ],
+      "uri": "webcast-va/eb77ead5c3abb6da6034d3cf6cfeb438",
+      "height": 0,
+      "width": 0,
+      "avgColor": "#F1FFEB",
+      "imageType": 0,
+      "openWebUrl": "",
+      "isAnimated": false
+    },
+    "goldEffect": "",
+    "isBroadcastGift": false,
+    "isEffectBefview": false,
+    "isRandomGift": false,
+    "isBoxGift": false,
+    "canPutInGiftBox": false,
+    "trackerParams": {},
+    "colorInfos": [],
+    "giftRankRecommendInfo": "",
+    "giftSubType": 0,
+    "giftVerticalScenarios": [
+      0,
+      27
+    ],
+    "groupInTab": 0,
+    "isGalleryGift": false,
+    "giftSkins": [],
+    "giftLabelType": 0,
+    "giftTexts": [],
+    "giftSkinToGiftTextsInfos": [],
+    "expirationTimestamp": "0",
+    "isGlobalGift": false,
+    "disableGalleryBanner": false,
+    "giftResources": {},
+    "resourceId": "0",
+    "bizExtra": {},
+    "giftStructHash": "",
+    "strategyEvent": ""
+  },
+  "logId": "2026080206015229045DBF9AAB51F26362",
+  "sendType": "0",
+  "trayDisplayText": {
+    "key": "",
+    "defaultPattern": "",
+    "pieces": []
+  },
+  "bannedDisplayEffects": "0",
+  "monitorExtra": "",
+  "monitorInfo": {
+    "anchorId": "7623258401003176967",
+    "profitapiMessageDur": "0",
+    "sendGiftProfitApiStartMs": "0",
+    "sendGiftProfitCoreStartMs": "0",
+    "sendGiftReqStartMs": "0",
+    "sendGiftSendMessageSuccessMs": "1785621716144",
+    "sendProfitapiDur": "0",
+    "toUserId": "7623258401003176967",
+    "sendGiftStartClientLocalMs": "0",
+    "fromPlatform": "android",
+    "fromVersion": "460203"
+  },
+  "colorId": "-1",
+  "isFirstSent": false,
+  "orderId": "",
+  "lynxExtra": [],
+  "userIdentity": {
+    "isGiftGiverOfAnchor": true,
+    "isSubscriberOfAnchor": false,
+    "isMutualFollowingWithAnchor": false,
+    "isFollowerOfAnchor": false,
+    "isModeratorOfAnchor": false,
+    "isAnchor": false
+  },
+  "linkmicGiftExpressionStrategy": 1,
+  "disableGiftTracking": false,
+  "version": 0,
+  "sponsorshipInfo": [
+    {
+      "giftId": "0",
+      "sponsorId": "0",
+      "lightGiftUp": false,
+      "unlightedGiftIcon": "webcast-va/resource/e384bec12920b2e487dcf1d5b30d7dce.png",
+      "giftGalleryDetailPageSchemeUrl": "aweme://roma_redirect/?class_type=800&container_bg_color=120B08&roma_group_key=roma_schema_group_gift_gallery&roma_page_key=roma_schema_page_detail_and_home",
+      "giftGalleryClickSponsor": false,
+      "giftTrayStyle": 0,
+      "becomeAllSponsored": false
+    }
+  ],
+  "publicAreaMessageCommon": {
+    "scrollGapCount": "1",
+    "anchorScrollGapCount": "0",
+    "releaseToScrollArea": true,
+    "anchorReleaseToScrollArea": false,
+    "isAnchorMarked": false,
+    "creatorSuccessInfo": {
+      "tags": [],
+      "topicList": []
+    },
+    "portraitInfo": {
+      "userMetrics": [],
+      "portraitTag": []
+    },
+    "userInteractionInfo": {
+      "likeCnt": "0",
+      "commentCnt": "0",
+      "shareCnt": "0"
+    },
+    "adminFoldType": "1",
+    "displayInfo": {
+      "durationType": 0,
+      "showDurationMs": "2000",
+      "incrDurationMs": "0",
+      "stayStyle": 0
+    },
+    "hideAboveScrollArea": false
+  },
+  "signature": "a82b99d53c396fe410241264c77bdcdb",
+  "signatureVersion": "v1",
+  "multiGenerateMessage": false,
+  "toMemberId": "",
+  "toMemberIdInt": "0",
+  "toMemberNickname": "",
+  "displayDurationMs": "0",
+  "isAssetBundleGift": false,
+  "effectExtra": "{\"sender_id\":\"99880363790831616\"}",
+  "giftVariantId": 0,
+  "shinyCardUnlockToken": ""
+}
