@@ -519,35 +519,35 @@ export default function App() {
               className={`sidebar-item ${activeTab === 'rules' || activeTab === 'dashboard' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard/rules')}
             >
-              <span className="icon">🎮</span> Regras de Interação
+              <span className="icon">🎮</span> Regras de interações
             </div>
             
             <div 
               className={`sidebar-item ${activeTab === 'instructions' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard/instructions')}
             >
-              <span className="icon">🚀</span> Como Conectar (CLI)
+              <span className="icon">🚀</span> Cliente desktop
             </div>
             
             <div 
               className={`sidebar-item ${activeTab === 'widget' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard/widget')}
             >
-              <span className="icon">📺</span> Alertas no OBS
+              <span className="icon">📺</span> Alertas e Overlays
             </div>
             
             <div 
               className={`sidebar-item ${activeTab === 'subscription' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard/subscription')}
             >
-              <span className="icon">💎</span> Assinatura e Planos
+              <span className="icon">💎</span> Assinatura
             </div>
             
             <div 
               className={`sidebar-item ${activeTab === 'account' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard/account')}
             >
-              <span className="icon">⚙️</span> Minha Conta
+              <span className="icon">⚙️</span> Minha conta
             </div>
               
             {user?.is_admin && (
@@ -888,22 +888,50 @@ export default function App() {
                   
                   {!pixData ? (
                     <>
-                      <div style={{display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap'}}>
-                        <button className={`btn-secondary ${selectedPlan === 30 ? 'active' : ''}`} onClick={() => setSelectedPlan(30)} style={selectedPlan === 30 ? {borderColor: '#00E58F', color: '#00E58F'} : {}}>
-                          Mensal (R$ 20)
-                        </button>
-                        <button className={`btn-secondary ${selectedPlan === 90 ? 'active' : ''}`} onClick={() => setSelectedPlan(90)} style={selectedPlan === 90 ? {borderColor: '#00E58F', color: '#00E58F'} : {}}>
-                          Trimestral (R$ 50)<br/><span style={{fontSize: '0.7rem', color: '#10b981'}}>-16% OFF</span>
-                        </button>
-                        <button className={`btn-secondary ${selectedPlan === 180 ? 'active' : ''}`} onClick={() => setSelectedPlan(180)} style={selectedPlan === 180 ? {borderColor: '#00E58F', color: '#00E58F'} : {}}>
-                          Semestral (R$ 90)<br/><span style={{fontSize: '0.7rem', color: '#10b981'}}>-25% OFF</span>
-                        </button>
-                        <button className={`btn-secondary ${selectedPlan === 365 ? 'active' : ''}`} onClick={() => setSelectedPlan(365)} style={selectedPlan === 365 ? {borderColor: '#00E58F', color: '#00E58F'} : {}}>
-                          Anual (R$ 150)<br/><span style={{fontSize: '0.7rem', color: '#10b981'}}>-37% OFF</span>
-                        </button>
+                      <div className="plans-grid">
+                        <div className={`plan-card ${selectedPlan === 30 ? 'active' : ''}`} onClick={() => setSelectedPlan(30)}>
+                          <div className="plan-title">Mensal</div>
+                          <div className="plan-price">R$ 20<span>/mês</span></div>
+                          <ul className="plan-features">
+                            <li>Suporte prioritário</li>
+                            <li>Tempo de live ilimitado</li>
+                            <li>Acesso a todos os alertas</li>
+                          </ul>
+                        </div>
+                        
+                        <div className={`plan-card ${selectedPlan === 90 ? 'active' : ''}`} onClick={() => setSelectedPlan(90)}>
+                          <div className="plan-discount">-16% OFF</div>
+                          <div className="plan-title">Trimestral</div>
+                          <div className="plan-price">R$ 50<span>/trimestre</span></div>
+                          <ul className="plan-features">
+                            <li>Equivale a R$ 16,66/mês</li>
+                            <li>Renovação a cada 3 meses</li>
+                          </ul>
+                        </div>
+                        
+                        <div className={`plan-card ${selectedPlan === 180 ? 'active' : ''}`} onClick={() => setSelectedPlan(180)}>
+                          <div className="plan-discount">-25% OFF</div>
+                          <div className="plan-title">Semestral</div>
+                          <div className="plan-price">R$ 90<span>/semestre</span></div>
+                          <ul className="plan-features">
+                            <li>Equivale a R$ 15,00/mês</li>
+                            <li>Renovação a cada 6 meses</li>
+                          </ul>
+                        </div>
+                        
+                        <div className={`plan-card ${selectedPlan === 365 ? 'active' : ''}`} onClick={() => setSelectedPlan(365)}>
+                          <div className="plan-discount">-37% OFF</div>
+                          <div className="plan-title">Anual</div>
+                          <div className="plan-price">R$ 150<span>/ano</span></div>
+                          <ul className="plan-features">
+                            <li>Equivale a R$ 12,50/mês</li>
+                            <li>Melhor custo benefício</li>
+                          </ul>
+                        </div>
                       </div>
-                      <div className="payment-methods">
-                        <button className="btn-pix" onClick={generatePix} disabled={loadingPix}>
+                      
+                      <div className="payment-methods" style={{display: 'flex', justifyContent: 'center', marginTop: '1rem'}}>
+                        <button className="btn-pix" onClick={generatePix} disabled={loadingPix} style={{fontSize: '1.2rem', padding: '1rem 3rem'}}>
                           {loadingPix ? 'Gerando PIX...' : 'Pagar com PIX'}
                         </button>
                       </div>

@@ -7,7 +7,19 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Modal & Toast states
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalUserId, setModalUserId] = useState(null);
+  const [modalMinutes, setModalMinutes] = useState('60');
+  const [toastMsg, setToastMsg] = useState(null);
+
   const navigate = useNavigate();
+
+  const showToast = (msg, type = 'success') => {
+    setToastMsg({ msg, type });
+    setTimeout(() => setToastMsg(null), 4000);
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -42,9 +54,15 @@ export default function AdminDashboard() {
     fetchStats();
   }, [navigate]);
 
-  const handleAddTrial = async (userId) => {
-    const minutes = prompt('Quantos minutos de trial deseja adicionar?');
-    if (!minutes || isNaN(minutes)) return;
+  const openTrialModal = (userId) => {
+    setModalUserId(userId);
+    setModalMinutes('60');
+    setModalOpen(true);
+  };
+
+  const submitAddTrial = async () => {
+    if (!modalMinutes || isNaN(modalMinutes)) return;
+    setModalOpen(false);
 
     try {
       const token = localStorage.getItem('token');
@@ -54,11 +72,11 @@ export default function AdminDashboard() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ userId, minutes: parseInt(minutes) })
+        body: JSON.stringify({ userId: modalUserId, minutes: parseInt(modalMinutes) })
       });
 
       if (response.ok) {
-        alert('Tempo adicionado com sucesso!');
+        showToast('Tempo adicionado com sucesso!', 'success');
         const refreshResponse = await fetch(`${API_BASE_URL}/api/admin/stats`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -66,10 +84,10 @@ export default function AdminDashboard() {
           setStats(await refreshResponse.json());
         }
       } else {
-        alert('Falha ao adicionar tempo.');
+        showToast('Falha ao adicionar tempo.', 'error');
       }
     } catch (err) {
-      alert('Erro na requisição: ' + err.message);
+      showToast('Erro na requisição: ' + err.message, 'error');
     }
   };
 
@@ -162,7 +180,7 @@ export default function AdminDashboard() {
                   <td>{new Date(user.created_at).toLocaleDateString('pt-BR')}</td>
                   <td>{user.trial_time_used} ms</td>
                   <td>
-                    <button className="btn-small btn-action" onClick={() => handleAddTrial(user.id)}>
+                    <button className="btn-small btn-action" onClick={() => openTrialModal(user.id)}>
                       + Tempo de Trial
                     </button>
                   </td>
@@ -172,6 +190,53 @@ export default function AdminDashboard() {
           </table>
         </div>
       </div>
+
+      {/* Modern Modal for Trial Time */}
+      {modalOpen && (
+        <div className="modal-overlay" style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(5px)',
+          display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
+        }}>
+          <div className="modal-content" style={{
+            background: '#18181b', border: '1px solid rgba(255, 255, 255, 0.1)',
+            padding: '2rem', borderRadius: '16px', width: '90%', maxWidth: '400px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+          }}>
+            <h2 style={{ marginBottom: '1rem', fontSize: '1.4rem' }}>Adicionar Tempo de Trial</h2>
+            <p style={{ color: '#a1a1aa', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+              Defina a quantidade de minutos extras de período gratuito para o usuário #{modalUserId}.
+            </p>
+            <div className="input-group">
+              <label>Minutos (ex: 60 para 1 hora)</label>
+              <input 
+                type="number" 
+                value={modalMinutes}
+                onChange={e => setModalMinutes(e.target.value)}
+                style={{ width: '100%', marginTop: '0.5rem' }}
+                autoFocus
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+              <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setModalOpen(false)}>Cancelar</button>
+              <button className="btn-primary" style={{ flex: 1 }} onClick={submitAddTrial}>Confirmar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modern Toast Notification */}
+      {toastMsg && (
+        <div className={`toast-notification ${toastMsg.type}`} style={{
+          position: 'fixed', bottom: '20px', right: '20px',
+          background: toastMsg.type === 'success' ? '#10b981' : '#ef4444',
+          color: '#fff', padding: '1rem 1.5rem', borderRadius: '8px',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+          zIndex: 1100, fontWeight: 'bold', animation: 'slideUp 0.3s ease-out'
+        }}>
+          {toastMsg.msg}
+        </div>
+      )}
     </div>
   );
 }
