@@ -14,10 +14,14 @@ const LegendOverlay = () => {
 
   useEffect(() => {
     // Add transparent background to body for OBS
+    document.body.style.background = 'transparent';
     document.body.style.backgroundColor = 'transparent';
+    document.body.style.backgroundImage = 'none';
     document.body.style.overflow = 'hidden'; // Evita barras de rolagem no OBS
     return () => {
+      document.body.style.background = '';
       document.body.style.backgroundColor = '';
+      document.body.style.backgroundImage = '';
       document.body.style.overflow = '';
     };
   }, []);
@@ -34,7 +38,7 @@ const LegendOverlay = () => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const rulesData = await rulesRes.json();
-      setRules(rulesData);
+      setRules(rulesData.rules || []);
     } catch (e) {
       console.error('Erro ao carregar dados da legenda:', e);
     }
