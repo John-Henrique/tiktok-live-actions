@@ -13,6 +13,7 @@ export default function AdminDashboard() {
   const [modalUserId, setModalUserId] = useState(null);
   const [modalMinutes, setModalMinutes] = useState('60');
   const [toastMsg, setToastMsg] = useState(null);
+  const [activeTab, setActiveTab] = useState('overview'); // overview, users, subscriptions, finance
 
   const navigate = useNavigate();
 
@@ -94,8 +95,6 @@ export default function AdminDashboard() {
   if (loading) return <div className="loading-screen">Carregando painel admin...</div>;
   if (error) return <div className="error-message">{error}</div>;
   if (!stats) return null;
-
-  const [activeTab, setActiveTab] = useState('overview'); // overview, users, subscriptions, finance
 
   const renderOverview = () => {
     const monthlyData = stats.users.reduce((acc, user) => {
