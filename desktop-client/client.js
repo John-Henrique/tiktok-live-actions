@@ -97,13 +97,13 @@ function startSocket(token) {
                     process.exit();
                 }
                 console.log("Abrindo navegador...");
-                exec(`start ${FRONTEND_URL}`);
+                exec(`start ${FRONTEND_URL}/dashboard/subscription`);
                 process.stdin.setRawMode(false);
                 process.stdin.pause();
             });
         } else {
             // Fallback se não suportar rawMode
-            exec(`start ${FRONTEND_URL}`);
+            exec(`start ${FRONTEND_URL}/dashboard/subscription`);
         }
     });
 

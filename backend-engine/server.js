@@ -365,7 +365,13 @@ app.post('/api/auth/cli-authorize', authenticateToken, (req, res) => {
 
 app.post('/api/payments/pix', authenticateToken, (req, res) => {
     const userId = req.user.id;
-    const chargeValue = 2000; // R$ 20,00 (em centavos)
+    const planDuration = req.body.planDuration || 30; // default 30 days
+    
+    let chargeValue = 2000;
+    if (planDuration === 90) chargeValue = 5000; // Trimestral (R$ 50)
+    if (planDuration === 180) chargeValue = 9000; // Semestral (R$ 90)
+    if (planDuration === 365) chargeValue = 15000; // Anual (R$ 150)
+
     const correlationID = `order_${userId}_${Date.now()}`;
 
     const payload = JSON.stringify({
@@ -399,8 +405,8 @@ app.post('/api/payments/pix', authenticateToken, (req, res) => {
                 const data = JSON.parse(responseData);
                 if (data.charge) {
                     // Salvar pagamento no banco de dados como pendente
-                    db.run('INSERT INTO payments (user_id, charge_id, amount) VALUES (?, ?, ?)', 
-                           [userId, data.charge.correlationID, chargeValue], function(err) {
+                    db.run('INSERT INTO payments (user_id, charge_id, amount, plan_duration) VALUES (?, ?, ?, ?)', 
+                           [userId, data.charge.correlationID, chargeValue, planDuration], function(err) {
                         if (err) console.error("Erro ao salvar payment no DB:", err);
                     });
 
@@ -438,18 +444,37 @@ app.post('/api/webhooks/woovi', (req, res) => {
     if (event && event.event === 'OPENPIX:CHARGE_COMPLETED' && event.charge) {
         const correlationID = event.charge.correlationID;
 
-        // Procura no banco qual o user desse charge
-        db.get('SELECT user_id FROM payments WHERE charge_id = ? AND status = "PENDING"', [correlationID], (err, payment) => {
+        // Procura no banco qual o user e os dias desse charge
+        db.get('SELECT user_id, plan_duration FROM payments WHERE charge_id = ? AND status = "PENDING"', [correlationID], (err, payment) => {
             if (err || !payment) return;
             
             const userId = payment.user_id;
+            const duration = payment.plan_duration || 30;
             
             // Marca pagamento como concluído
             db.run('UPDATE payments SET status = "COMPLETED" WHERE charge_id = ?', [correlationID]);
             
-            // Atualiza usuário para PRO
-            db.run('UPDATE users SET plan_status = "pro", trial_used = 1 WHERE id = ?', [userId], (err2) => {
+            // Atualiza usuário para PRO e soma o tempo ao pro_expires_at (ou cria um novo se tiver vencido)
+            const query = `
+                UPDATE users 
+                SET plan_status = "pro", 
+                    trial_used = 1,
+                    pro_expires_at = datetime(
+                        CASE 
+                            WHEN pro_expires_at IS NULL OR pro_expires_at < CURRENT_TIMESTAMP THEN CURRENT_TIMESTAMP 
+                            ELSE pro_expires_at 
+                        END, 
+                        '+' || ? || ' days'
+                    )
+                WHERE id = ?
+            `;
+            
+            db.run(query, [duration, userId], (err2) => {
                 if (err2) return console.error("Erro ao dar upgrade no usuário", err2);
+                
+                // Emite o alerta de sucesso com confetes para o painel em tempo real
+                io.to(userId.toString()).emit('payment-completed', { duration });
+
 
                 console.log(`\n🎉 Pagamento Recebido! Usuário ${userId} agora é PRO!`);
                 
@@ -481,6 +506,26 @@ app.get('/api/available-gifts', (req, res) => {
     } catch (e) {
         res.status(500).json({ error: 'Erro ao listar presentes' });
     }
+});
+
+// Retorna histórico de pagamentos e informações da assinatura
+app.get('/api/payments', authenticateToken, (req, res) => {
+    const userId = req.user.id;
+    
+    db.get('SELECT plan_status, pro_expires_at, trial_used FROM users WHERE id = ?', [userId], (err, user) => {
+        if (err || !user) return res.status(500).json({ error: 'Erro ao buscar dados do usuário' });
+        
+        db.all('SELECT charge_id, amount, status, plan_duration, created_at FROM payments WHERE user_id = ? ORDER BY created_at DESC LIMIT 5', [userId], (err2, payments) => {
+            if (err2) return res.status(500).json({ error: 'Erro ao buscar pagamentos' });
+            
+            res.json({
+                planStatus: user.plan_status,
+                trialUsed: user.trial_used,
+                proExpiresAt: user.pro_expires_at,
+                history: payments
+            });
+        });
+    });
 });
 
 app.get('/api/rules', authenticateToken, (req, res) => {

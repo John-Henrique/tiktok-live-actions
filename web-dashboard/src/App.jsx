@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import Confetti from 'react-confetti';
+import { io } from 'socket.io-client';
 import { API_BASE_URL } from './config';
 import './index.css';
 
@@ -123,7 +125,15 @@ const CustomModeSelect = ({ value, onChange }) => {
 };
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // States for new features
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [proExpiresAt, setProExpiresAt] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState(30);
+  const activeTab = location.pathname.split('/').pop() || 'rules';
   const [targetUsername, setTargetUsername] = useState('');
   const [rules, setRules] = useState([]);
   const [availableGifts, setAvailableGifts] = useState([]);
@@ -379,11 +389,14 @@ export default function App() {
 
   const generatePix = async () => {
     setLoadingPix(true);
-    const token = localStorage.getItem('token');
     try {
       const res = await fetch(`${API_BASE_URL}/api/payments/pix`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ planDuration: selectedPlan })
       });
       const data = await res.json();
       if (data.success) {
@@ -452,24 +465,23 @@ export default function App() {
     }
   };
 
-  const startPollingPayment = () => {
-    const token = localStorage.getItem('token');
-    // Poll a cada 3 segundos
-    const interval = setInterval(async () => {
+  useEffect(() => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+        const res = await fetch(API_URL, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         const data = await res.json();
-        if (data && data.plan === 'pro') {
-            clearInterval(interval);
-            setUser(data);
-            localStorage.setItem('user', JSON.stringify(data));
-            setPixData(null); // Fecha o QR Code
+        setTargetUsername(data.targetUsername);
+        if (data.rules && Array.isArray(data.rules)) {
+          setRules(data.rules);
         }
       } catch (e) {}
-    }, 3000);
-  };
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (!user || user.plan === 'pro') return;
@@ -505,42 +517,49 @@ export default function App() {
       {/* SIDEBAR */}
       <aside className="saas-sidebar">
         <div className="sidebar-logo">TikTok Live <span>Actions</span></div>
-        <nav className="sidebar-menu">
-          <button 
-            className={`sidebar-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
-          >
-            📊 Painel e Regras
-          </button>
-          <button 
-            className={`sidebar-item ${activeTab === 'instructions' ? 'active' : ''}`}
-            onClick={() => setActiveTab('instructions')}
-          >
-            📖 Como Usar
-          </button>
-          <button 
-            className={`sidebar-item ${activeTab === 'subscription' ? 'active' : ''}`}
-            onClick={() => setActiveTab('subscription')}
-          >
-            💳 Assinatura
-          </button>
-          <button 
-            className={`sidebar-item ${activeTab === 'account' ? 'active' : ''}`}
-            onClick={() => setActiveTab('account')}
-          >
-            ⚙️ Minha Conta
-          </button>
-          
-          <button className="sidebar-item danger" onClick={handleLogout}>
-            Sair da Conta
-          </button>
-        </nav>
+          <div className="sidebar-menu">
+            <div 
+              className={`sidebar-item ${activeTab === 'rules' || activeTab === 'dashboard' ? 'active' : ''}`}
+              onClick={() => navigate('/dashboard/rules')}
+            >
+              <span className="icon">🎮</span> Regras de Interação
+            </div>
+            
+            <div 
+              className={`sidebar-item ${activeTab === 'instructions' ? 'active' : ''}`}
+              onClick={() => navigate('/dashboard/instructions')}
+            >
+              <span className="icon">🚀</span> Como Conectar (CLI)
+            </div>
+            
+            <div 
+              className={`sidebar-item ${activeTab === 'widget' ? 'active' : ''}`}
+              onClick={() => navigate('/dashboard/widget')}
+            >
+              <span className="icon">📺</span> Alertas no OBS
+            </div>
+            
+            <div 
+              className={`sidebar-item ${activeTab === 'subscription' ? 'active' : ''}`}
+              onClick={() => navigate('/dashboard/subscription')}
+            >
+              <span className="icon">💎</span> Assinatura e Planos
+            </div>
+            
+            <div 
+              className={`sidebar-item ${activeTab === 'account' ? 'active' : ''}`}
+              onClick={() => navigate('/dashboard/account')}
+            >
+              <span className="icon">⚙️</span> Minha Conta
+            </div>
+          </div>
       </aside>
 
       {/* CONTENT AREA */}
       <main className="saas-content">
+        {showConfetti && <Confetti />}
         
-        {activeTab === 'dashboard' && (
+        {(activeTab === 'rules' || activeTab === 'dashboard') && (
           <div className="tab-dashboard">
             <div className="saas-header">
               <h1>Seu Painel</h1>
@@ -842,22 +861,38 @@ export default function App() {
               {user?.plan !== 'pro' && (
                 <>
                   <div className="sub-timer">
-                    Tempo restante da Live Teste:<br/>
+                    Tempo restante da Live Teste (Total de 1 Hora):<br/>
                     <span>{timeLeftStr}</span>
                   </div>
 
-                  <h3 style={{marginBottom: '1rem'}}>Fazer Upgrade para Plano Pro (R$ 20/mês)</h3>
-                  <p style={{color: '#a1a1aa', marginBottom: '1.5rem'}}>O plano Pro remove o limite de tempo da Live e garante suporte prioritário.</p>
+                  <h3 style={{marginBottom: '1rem'}}>Fazer Upgrade para Plano Pro</h3>
+                  <p style={{color: '#a1a1aa', marginBottom: '1.5rem'}}>
+                    Quando o seu tempo acabar, será necessário ter uma assinatura para continuar usando o app na sua Live. 
+                    Escolha um plano abaixo para liberar acesso ilimitado!
+                  </p>
                   
                   {!pixData ? (
-                    <div className="payment-methods">
-                      <button className="btn-pix" onClick={generatePix} disabled={loadingPix}>
-                        {loadingPix ? 'Gerando PIX...' : 'Pagar com PIX'}
-                      </button>
-                      <button className="btn-paypal">
-                        Pagar com PayPal
-                      </button>
-                    </div>
+                    <>
+                      <div style={{display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap'}}>
+                        <button className={`btn-secondary ${selectedPlan === 30 ? 'active' : ''}`} onClick={() => setSelectedPlan(30)} style={selectedPlan === 30 ? {borderColor: '#00E58F', color: '#00E58F'} : {}}>
+                          Mensal (R$ 20)
+                        </button>
+                        <button className={`btn-secondary ${selectedPlan === 90 ? 'active' : ''}`} onClick={() => setSelectedPlan(90)} style={selectedPlan === 90 ? {borderColor: '#00E58F', color: '#00E58F'} : {}}>
+                          Trimestral (R$ 50)<br/><span style={{fontSize: '0.7rem', color: '#10b981'}}>-16% OFF</span>
+                        </button>
+                        <button className={`btn-secondary ${selectedPlan === 180 ? 'active' : ''}`} onClick={() => setSelectedPlan(180)} style={selectedPlan === 180 ? {borderColor: '#00E58F', color: '#00E58F'} : {}}>
+                          Semestral (R$ 90)<br/><span style={{fontSize: '0.7rem', color: '#10b981'}}>-25% OFF</span>
+                        </button>
+                        <button className={`btn-secondary ${selectedPlan === 365 ? 'active' : ''}`} onClick={() => setSelectedPlan(365)} style={selectedPlan === 365 ? {borderColor: '#00E58F', color: '#00E58F'} : {}}>
+                          Anual (R$ 150)<br/><span style={{fontSize: '0.7rem', color: '#10b981'}}>-37% OFF</span>
+                        </button>
+                      </div>
+                      <div className="payment-methods">
+                        <button className="btn-pix" onClick={generatePix} disabled={loadingPix}>
+                          {loadingPix ? 'Gerando PIX...' : 'Pagar com PIX'}
+                        </button>
+                      </div>
+                    </>
                   ) : (
                     <div className="pix-checkout" style={{background: '#fff', color: '#000', padding: '2rem', borderRadius: '16px', textAlign: 'center'}}>
                       <h3 style={{marginBottom: '1rem', color: '#000'}}>Escaneie o QR Code</h3>
@@ -872,6 +907,53 @@ export default function App() {
                     </div>
                   )}
                 </>
+              )}
+              {user?.plan === 'pro' && proExpiresAt && (
+                <div style={{marginTop: '2rem'}}>
+                  <h3 style={{marginBottom: '0.5rem'}}>Próxima Cobrança</h3>
+                  <p>
+                    O seu acesso expira em: <strong>{new Date(proExpiresAt).toLocaleDateString('pt-BR')}</strong>
+                  </p>
+                  
+                  {new Date(proExpiresAt).getTime() - Date.now() < 5 * 24 * 60 * 60 * 1000 && (
+                    <div style={{background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', padding: '1rem', borderRadius: '8px', marginTop: '1rem', color: '#ef4444'}}>
+                      ⚠️ <strong>Atenção:</strong> Sua assinatura vence em menos de 5 dias. Efetue um novo pagamento para continuar com o acesso ilimitado.
+                      <div style={{marginTop: '1rem'}}>
+                        <button className="btn-secondary" onClick={() => {
+                          const u = {...user};
+                          u.plan = 'free_trial';
+                          setUser(u); // Simula fim do plano pra abrir o checkout
+                        }}>Renovar Agora</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {paymentHistory.length > 0 && (
+                <div style={{marginTop: '3rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem'}}>
+                  <h3>Últimos Pagamentos</h3>
+                  <table style={{width: '100%', marginTop: '1rem', textAlign: 'left', borderCollapse: 'collapse'}}>
+                    <thead>
+                      <tr style={{borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
+                        <th style={{padding: '0.5rem'}}>Data</th>
+                        <th style={{padding: '0.5rem'}}>Plano</th>
+                        <th style={{padding: '0.5rem'}}>Valor</th>
+                        <th style={{padding: '0.5rem'}}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paymentHistory.map((p, i) => (
+                        <tr key={i} style={{borderBottom: '1px solid rgba(255,255,255,0.05)'}}>
+                          <td style={{padding: '0.5rem'}}>{new Date(p.created_at).toLocaleDateString('pt-BR')}</td>
+                          <td style={{padding: '0.5rem'}}>{p.plan_duration} Dias</td>
+                          <td style={{padding: '0.5rem'}}>R$ {(p.amount / 100).toFixed(2)}</td>
+                          <td style={{padding: '0.5rem', color: p.status === 'COMPLETED' ? '#10b981' : '#fbbf24'}}>{p.status}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           </div>
