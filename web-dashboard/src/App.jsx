@@ -626,26 +626,33 @@ export default function App() {
               <p>Bem-vindo, {user?.email}. Configure a conexão e os gatilhos da sua Live.</p>
             </div>
 
-            {userStats && userStats.length > 0 && (
-              <div className="saas-card" style={{ marginBottom: '2rem' }}>
-                <h2 style={{ marginBottom: '1rem', color: '#fff', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  📈 Evolução Mensal
-                </h2>
+            <div className="saas-card" style={{ marginBottom: '2rem' }}>
+              <h2 style={{ marginBottom: '1rem', color: '#fff', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                📈 Evolução Mensal
+              </h2>
+              {(!userStats || userStats.length === 0) ? (
+                <div style={{ padding: '2rem', textAlign: 'center', color: '#a1a1aa', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
+                  Ainda não há dados de presentes ou seguidores registrados para o seu perfil neste mês. Inicie sua live e receba presentes para começar a popular este gráfico!
+                </div>
+              ) : (
                 <div style={{ width: '100%', height: 300 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={userStats} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                      <XAxis dataKey="date" stroke="#a1a1aa" tickFormatter={(tick) => tick.slice(5).replace('-', '/')} />
+                      <XAxis dataKey="date" stroke="#a1a1aa" tickFormatter={(tick) => { const [y, m, d] = tick.split('-'); return `${d}/${m}`; }} />
                       <YAxis stroke="#a1a1aa" />
-                      <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#3f3f46', color: '#fff', borderRadius: '8px' }} />
+                      <Tooltip 
+                        labelFormatter={(label) => { const [y, m, d] = label.split('-'); return `${d}/${m}/${y}`; }}
+                        contentStyle={{ backgroundColor: '#18181b', borderColor: '#3f3f46', color: '#fff', borderRadius: '8px' }} 
+                      />
                       <Legend wrapperStyle={{ paddingTop: '10px' }} />
                       <Line type="monotone" name="Diamantes (Presentes)" dataKey="diamonds" stroke="#fbbf24" strokeWidth={3} activeDot={{ r: 6 }} dot={{ r: 4 }} />
                       <Line type="monotone" name="Seguidores" dataKey="followers" stroke="#00E58F" strokeWidth={3} activeDot={{ r: 6 }} dot={{ r: 4 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             <div className="saas-card">
               <div className="input-group username-input-group" style={{marginBottom: 0}}>
