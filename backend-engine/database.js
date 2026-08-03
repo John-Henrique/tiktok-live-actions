@@ -83,6 +83,18 @@ function initDb() {
                 });
             }
         });
+
+        // Tabela de Estatísticas Diárias do Usuário (Presentes e Seguidores)
+        db.run(`CREATE TABLE IF NOT EXISTS user_stats (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            date TEXT NOT NULL,
+            diamonds INTEGER DEFAULT 0,
+            followers INTEGER DEFAULT 0,
+            UNIQUE(user_id, date),
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )`);
+
     });
 }
 

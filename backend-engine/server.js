@@ -18,6 +18,24 @@ const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_saas_2026';
 const WOOVI_APP_ID = process.env.WOOVI_APP_ID || '';
 const TRIAL_DURATION_MS = 60 * 60 * 1000; // 1 hora
 
+const GIFT_PRICES = {
+    '5655': 1, // Rose
+    '8913': 1, // Rosa
+    '5487': 5, // Finger Heart
+    '5879': 30, // Doughnut
+    '5660': 100, // Hand Heart
+    '10061': 100, // Heart Puff
+    '5586': 10, // Hearts
+    '5827': 1, // Ice Cream Cone
+    '14488': 1, // Capybara
+    '6267': 1, // Corgi
+    '7934': 1, // Heart Me
+    '7842': 1, // Ice Cube
+    '19446': 1, // Wink wink
+    '19448': 1, // Slow motion
+    '6427': 1 // Hat and Mustache
+};
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -158,11 +176,36 @@ function connectToTikTok(userId, username, isTrial) {
         io.to(userId.toString()).emit('gift-received', {
             username: uniqueId, giftName, giftId, repeatCount, repeatEnd
         });
+
+        // Atualizar estatísticas de presentes
+        const diamondVal = data.diamondCount || GIFT_PRICES[String(giftId)] || 1;
+        const totalDiamonds = diamondVal * repeatCount;
+        const today = new Date().toISOString().slice(0, 10);
+        
+        db.run(`INSERT INTO user_stats (user_id, date, diamonds, followers) 
+                VALUES (?, ?, ?, 0) 
+                ON CONFLICT(user_id, date) 
+                DO UPDATE SET diamonds = diamonds + ?`, 
+            [userId, today, totalDiamonds, totalDiamonds], 
+            (err) => {
+                if (err) console.error('[DB] Erro ao atualizar estatísticas de presentes:', err);
+            });
     });
 
     tiktokLiveConnection.on('follow', data => {
         const uniqueId = data.user ? (data.user.uniqueId || data.user.displayId) : "User";
         io.to(userId.toString()).emit('follow', { username: uniqueId });
+
+        // Atualizar estatísticas de seguidores
+        const today = new Date().toISOString().slice(0, 10);
+        db.run(`INSERT INTO user_stats (user_id, date, diamonds, followers) 
+                VALUES (?, ?, 0, 1) 
+                ON CONFLICT(user_id, date) 
+                DO UPDATE SET followers = followers + 1`, 
+            [userId, today], 
+            (err) => {
+                if (err) console.error('[DB] Erro ao atualizar estatísticas de seguidores:', err);
+            });
     });
 
     tiktokLiveConnection.on('like', data => {
@@ -652,15 +695,32 @@ app.get('/api/available-gifts', (req, res) => {
         const gifts = files.filter(f => f.endsWith('.png') || f.endsWith('.jpg')).map(f => {
             const parts = f.replace(/\.(png|jpg|jpeg)$/i, '').split('-');
             const publicUrl = process.env.PUBLIC_URL || 'http://localhost:3001';
+            const giftId = parts.length > 1 ? parts[1] : '';
             return {
-                filename: f, name: parts[0], id: parts.length > 1 ? parts[1] : '',
-                diamondCount: 0, url: `${publicUrl}/gifts/${f}`
+                filename: f, name: parts[0], id: giftId,
+                diamondCount: GIFT_PRICES[giftId] || 0, url: `${publicUrl}/gifts/${f}`
             };
         });
         res.json(gifts);
     } catch (e) {
         res.status(500).json({ error: 'Erro ao listar presentes' });
     }
+});
+
+// Retorna estatísticas de diamantes e seguidores
+app.get('/api/user/stats', authenticateToken, (req, res) => {
+    const userId = req.user.id;
+    // Últimos 30 dias
+    const dateLimit = new Date();
+    dateLimit.setDate(dateLimit.getDate() - 30);
+    const dateLimitStr = dateLimit.toISOString().slice(0, 10);
+    
+    db.all('SELECT date, diamonds, followers FROM user_stats WHERE user_id = ? AND date >= ? ORDER BY date ASC', 
+        [userId, dateLimitStr], 
+        (err, stats) => {
+            if (err) return res.status(500).json({ error: 'Erro ao buscar estatísticas' });
+            res.json(stats);
+        });
 });
 
 // Retorna histórico de pagamentos e informações da assinatura

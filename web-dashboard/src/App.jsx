@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Confetti from 'react-confetti';
 import { io } from 'socket.io-client';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { API_BASE_URL } from './config';
 import './index.css';
 
@@ -139,6 +140,7 @@ export default function App() {
   const [availableGifts, setAvailableGifts] = useState([]);
   const [status, setStatus] = useState('Buscando configurações...');
   const [user, setUser] = useState(null);
+  const [userStats, setUserStats] = useState([]);
   const [pixData, setPixData] = useState(null);
   const [loadingPix, setLoadingPix] = useState(false);
   const [toastMsg, setToastMsg] = useState(null);
@@ -239,6 +241,13 @@ export default function App() {
           const freshUser = await userRes.json();
           setUser(freshUser);
           localStorage.setItem('user', JSON.stringify(freshUser));
+        }
+
+        const statsRes = await fetch(`${API_BASE_URL}/api/user/stats`, {
+           headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (statsRes.ok) {
+           setUserStats(await statsRes.json());
         }
       } catch (e) {
         console.error('Falha ao atualizar dados do usuario', e);
@@ -616,6 +625,27 @@ export default function App() {
               <h1>Seu Painel</h1>
               <p>Bem-vindo, {user?.email}. Configure a conexão e os gatilhos da sua Live.</p>
             </div>
+
+            {userStats && userStats.length > 0 && (
+              <div className="saas-card" style={{ marginBottom: '2rem' }}>
+                <h2 style={{ marginBottom: '1rem', color: '#fff', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  📈 Evolução Mensal
+                </h2>
+                <div style={{ width: '100%', height: 300 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={userStats} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
+                      <XAxis dataKey="date" stroke="#a1a1aa" tickFormatter={(tick) => tick.slice(5).replace('-', '/')} />
+                      <YAxis stroke="#a1a1aa" />
+                      <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#3f3f46', color: '#fff', borderRadius: '8px' }} />
+                      <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                      <Line type="monotone" name="Diamantes (Presentes)" dataKey="diamonds" stroke="#fbbf24" strokeWidth={3} activeDot={{ r: 6 }} dot={{ r: 4 }} />
+                      <Line type="monotone" name="Seguidores" dataKey="followers" stroke="#00E58F" strokeWidth={3} activeDot={{ r: 6 }} dot={{ r: 4 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
 
             <div className="saas-card">
               <div className="input-group username-input-group" style={{marginBottom: 0}}>
