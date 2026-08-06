@@ -97,6 +97,29 @@ export default function Landing() {
             </div>
           </div>
         </div>
+
+        <div className="featured-feature-card" style={{ marginTop: '4rem' }}>
+          <div className="featured-video">
+            <video 
+              src="https://www.w3schools.com/html/mov_bbb.mp4" 
+              controls
+              muted
+              autoPlay
+              loop
+            />
+          </div>
+          <div className="featured-content">
+            <div className="badge" style={{ display: 'inline-block', marginBottom: '1rem' }}>NOVIDADE</div>
+            <h3 style={{ fontSize: '2rem', marginBottom: '1rem', color: '#fff' }}>
+              Live com <span className="highlight">Impressora Térmica</span>
+            </h3>
+            <p style={{ fontSize: '1.1rem', color: '#a1a1aa', lineHeight: 1.6 }}>
+              A inovação que está bombando no TikTok! Imprima automaticamente o nome 
+              dos seus novos seguidores e de quem enviar presentes direto em uma impressora térmica ao seu lado. 
+              Gere extrema curiosidade e engajamento no seu público!
+            </p>
+          </div>
+        </div>
       </section>
 
       <section id="pricing" className="pricing-section">
