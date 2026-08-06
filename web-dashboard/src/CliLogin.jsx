@@ -61,7 +61,7 @@ export default function CliLogin() {
     <div className="auth-page">
       <div className="auth-split" style={{maxWidth: '600px', display: 'flex', flexDirection: 'column'}}>
         <div className="auth-info" style={{padding: '2rem', textAlign: 'center', background: 'radial-gradient(circle at top, rgba(0, 229, 143, 0.15), transparent 70%)'}}>
-          <div className="auth-logo" style={{marginBottom: '1rem'}}>TikTok Live <span>Actions</span></div>
+          <div className="auth-logo" style={{marginBottom: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', float: 'none', position: 'static'}}>TikTok Live <span style={{marginLeft: '6px'}}>Actions</span></div>
           <h2>Conectar Dispositivo</h2>
           <p style={{marginBottom: 0}}>Você está prestes a autorizar o motor local (Desktop CLI) a se conectar com sua conta.</p>
         </div>

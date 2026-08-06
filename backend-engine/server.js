@@ -172,9 +172,28 @@ function connectToTikTok(userId, username, isTrial) {
         const repeatCount = data.repeatCount || 1;
         const repeatEnd = typeof data.repeatEnd !== 'undefined' ? data.repeatEnd : true;
         
-        console.log(`[TikTok @${username}] Gift: ${giftName} de ${uniqueId}`);
+        let localGiftIconUrl = '';
+        try {
+            const giftsDir = path.join(__dirname, 'public', 'gifts');
+            if (fs.existsSync(giftsDir)) {
+                const files = fs.readdirSync(giftsDir);
+                const matchingFile = files.find(f => f.toLowerCase().startsWith(giftName.toLowerCase() + '-'));
+                if (matchingFile) {
+                    const publicUrl = process.env.PUBLIC_URL || 'http://localhost:3001';
+                    localGiftIconUrl = `${publicUrl}/gifts/${matchingFile}`;
+                }
+            }
+        } catch (e) {}
+
+        const finalGiftIconUrl = data.giftPictureUrl || (data.giftDetails && data.giftDetails.giftImage && (data.giftDetails.giftImage.urlList && data.giftDetails.giftImage.urlList[0] || data.giftDetails.giftImage.url_list && data.giftDetails.giftImage.url_list[0])) || localGiftIconUrl;
+        const profilePictureUrl = (user.avatarThumb && (user.avatarThumb.urlList && user.avatarThumb.urlList[0] || user.avatarThumb.url_list && user.avatarThumb.url_list[0])) || 
+                                 (user.avatarMedium && (user.avatarMedium.urlList && user.avatarMedium.urlList[0] || user.avatarMedium.url_list && user.avatarMedium.url_list[0])) || 
+                                 "";
+
+        console.log("DEBUG GIFT DATA:", JSON.stringify(data));
+        console.log(`[TikTok @${username}] Gift: ${giftName} de ${uniqueId} (Icon: ${finalGiftIconUrl}, Avatar: ${profilePictureUrl})`);
         io.to(userId.toString()).emit('gift-received', {
-            username: uniqueId, giftName, giftId, repeatCount, repeatEnd
+            username: uniqueId, giftName, giftId, repeatCount, repeatEnd, giftIconUrl: finalGiftIconUrl, profilePictureUrl
         });
 
         // Atualizar estatísticas de presentes
@@ -193,8 +212,12 @@ function connectToTikTok(userId, username, isTrial) {
     });
 
     tiktokLiveConnection.on('follow', data => {
-        const uniqueId = data.user ? (data.user.uniqueId || data.user.displayId) : "User";
-        io.to(userId.toString()).emit('follow', { username: uniqueId });
+        const user = data.user || {};
+        const uniqueId = user.uniqueId || user.displayId || "User";
+        const profilePictureUrl = (user.avatarThumb && (user.avatarThumb.urlList && user.avatarThumb.urlList[0] || user.avatarThumb.url_list && user.avatarThumb.url_list[0])) || 
+                                 (user.avatarMedium && (user.avatarMedium.urlList && user.avatarMedium.urlList[0] || user.avatarMedium.url_list && user.avatarMedium.url_list[0])) || 
+                                 "";
+        io.to(userId.toString()).emit('follow', { username: uniqueId, profilePictureUrl });
 
         // Atualizar estatísticas de seguidores
         const today = new Date().toISOString().slice(0, 10);
@@ -209,13 +232,21 @@ function connectToTikTok(userId, username, isTrial) {
     });
 
     tiktokLiveConnection.on('like', data => {
-        const uniqueId = data.user ? (data.user.uniqueId || data.user.displayId) : "User";
-        io.to(userId.toString()).emit('like', { username: uniqueId, totalLikes: data.totalLikeCount || 1 });
+        const user = data.user || {};
+        const uniqueId = user.uniqueId || user.displayId || "User";
+        const profilePictureUrl = (user.avatarThumb && (user.avatarThumb.urlList && user.avatarThumb.urlList[0] || user.avatarThumb.url_list && user.avatarThumb.url_list[0])) || 
+                                 (user.avatarMedium && (user.avatarMedium.urlList && user.avatarMedium.urlList[0] || user.avatarMedium.url_list && user.avatarMedium.url_list[0])) || 
+                                 "";
+        io.to(userId.toString()).emit('like', { username: uniqueId, totalLikes: data.totalLikeCount || 1, profilePictureUrl });
     });
 
     tiktokLiveConnection.on('share', data => {
-        const uniqueId = data.user ? (data.user.uniqueId || data.user.displayId) : "User";
-        io.to(userId.toString()).emit('share', { username: uniqueId });
+        const user = data.user || {};
+        const uniqueId = user.uniqueId || user.displayId || "User";
+        const profilePictureUrl = (user.avatarThumb && (user.avatarThumb.urlList && user.avatarThumb.urlList[0] || user.avatarThumb.url_list && user.avatarThumb.url_list[0])) || 
+                                 (user.avatarMedium && (user.avatarMedium.urlList && user.avatarMedium.urlList[0] || user.avatarMedium.url_list && user.avatarMedium.url_list[0])) || 
+                                 "";
+        io.to(userId.toString()).emit('share', { username: uniqueId, profilePictureUrl });
     });
 
     tiktokLiveConnection.on('disconnected', () => {
@@ -424,16 +455,51 @@ app.post('/api/auth/login', (req, res) => {
         }
         
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
-        res.json({ success: true, token, user: { id: user.id, email: user.email, tiktok_username: user.tiktok_username, plan: user.plan_status, trial_used: user.trial_used, trial_time_used: user.trial_time_used, is_admin: user.is_admin } });
+        res.json({ success: true, token, user: { id: user.id, email: user.email, tiktok_username: user.tiktok_username, plan: user.plan_status, trial_used: user.trial_used, trial_time_used: user.trial_time_used, is_admin: user.is_admin, live_mode: user.live_mode, printer_settings: user.printer_settings } });
     });
 });
 
 app.get('/api/auth/me', authenticateToken, (req, res) => {
-    db.get('SELECT id, email, tiktok_username, plan_status, trial_used, trial_time_used, is_admin FROM users WHERE id = ?', [req.user.id], (err, user) => {
+    db.get('SELECT id, email, tiktok_username, plan_status, trial_used, trial_time_used, is_admin, live_mode, printer_settings FROM users WHERE id = ?', [req.user.id], (err, user) => {
         if (err || !user) return res.status(404).json({ error: 'Usuário não encontrado' });
-        res.json({ id: user.id, email: user.email, tiktok_username: user.tiktok_username, plan: user.plan_status, trial_used: user.trial_used, trial_time_used: user.trial_time_used, is_admin: user.is_admin });
+        res.json({ id: user.id, email: user.email, tiktok_username: user.tiktok_username, plan: user.plan_status, trial_used: user.trial_used, trial_time_used: user.trial_time_used, is_admin: user.is_admin, live_mode: user.live_mode, printer_settings: user.printer_settings });
     });
 });
+
+app.put('/api/user/settings', authenticateToken, (req, res) => {
+    const { liveMode, printerSettings } = req.body;
+    const printerSettingsJson = typeof printerSettings === 'object' ? JSON.stringify(printerSettings) : printerSettings;
+    
+    db.run(
+        'UPDATE users SET live_mode = ?, printer_settings = ? WHERE id = ?',
+        [liveMode || 'game', printerSettingsJson || null, req.user.id],
+        function(err) {
+            if (err) {
+                console.error('[DB] Erro ao salvar configuracoes do usuario:', err);
+                return res.status(500).json({ error: 'Erro ao salvar configurações' });
+            }
+            
+            // Notificar o desktop CLI via socket.io
+            let parsedSettings = null;
+            try {
+                parsedSettings = printerSettings ? (typeof printerSettings === 'string' ? JSON.parse(printerSettings) : printerSettings) : null;
+            } catch(e) {}
+            
+            io.to(req.user.id.toString()).emit('settings-updated', {
+                liveMode: liveMode || 'game',
+                printerSettings: parsedSettings
+            });
+            
+            res.json({ success: true, message: 'Configurações salvas com sucesso' });
+        }
+    );
+});
+
+app.post('/api/user/test-print', authenticateToken, (req, res) => {
+    io.to(req.user.id.toString()).emit('test-print', { message: 'Teste de impressao termica' });
+    res.json({ success: true, message: 'Sinal de teste enviado para a impressora' });
+});
+
 
 app.put('/api/auth/password', authenticateToken, (req, res) => {
     const { newPassword } = req.body;
@@ -692,9 +758,11 @@ app.get('/api/available-gifts', (req, res) => {
         const giftsDir = path.join(__dirname, 'public', 'gifts');
         if (!fs.existsSync(giftsDir)) return res.json([]);
         const files = fs.readdirSync(giftsDir);
+        const host = req.get('host');
+        const protocol = req.protocol;
+        const publicUrl = host.includes('localhost') ? `http://${host}` : `${protocol}://${host}`;
         const gifts = files.filter(f => f.endsWith('.png') || f.endsWith('.jpg')).map(f => {
             const parts = f.replace(/\.(png|jpg|jpeg)$/i, '').split('-');
-            const publicUrl = process.env.PUBLIC_URL || 'http://localhost:3001';
             const giftId = parts.length > 1 ? parts[1] : '';
             return {
                 filename: f, name: parts[0], id: giftId,
@@ -822,13 +890,21 @@ io.on('connection', (socket) => {
     // Join na sala exclusiva do usuário
     socket.join(socket.userId);
 
-    db.get('SELECT tiktok_username, plan_status, trial_used, rules_json FROM users LEFT JOIN rules ON users.id = rules.user_id WHERE users.id = ?', [socket.userId], (err, row) => {
+    db.get('SELECT tiktok_username, plan_status, trial_used, rules_json, live_mode, printer_settings FROM users LEFT JOIN rules ON users.id = rules.user_id WHERE users.id = ?', [socket.userId], (err, row) => {
         if (row) {
             try {
                 if (row.rules_json) {
                     const rulesObj = JSON.parse(row.rules_json);
                     socket.emit('rules-updated', rulesObj);
                 }
+            } catch(e) {}
+            
+            try {
+                const parsedSettings = row.printer_settings ? (typeof row.printer_settings === 'string' ? JSON.parse(row.printer_settings) : row.printer_settings) : null;
+                socket.emit('settings-updated', {
+                    liveMode: row.live_mode || 'game',
+                    printerSettings: parsedSettings
+                });
             } catch(e) {}
 
             // Inicia a conexão com o TikTok automaticamente se houver um username configurado

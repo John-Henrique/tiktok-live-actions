@@ -125,6 +125,65 @@ const CustomModeSelect = ({ value, onChange }) => {
   );
 };
 
+const CustomGenericSelect = ({ value, onChange, options }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selected = options.find(o => o.value === value) || options[0];
+
+  return (
+    <div className="custom-text-dropdown" ref={dropdownRef} style={{position: 'relative', width: '100%'}}>
+      <div 
+        className="custom-dropdown-header"
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+            padding: '0.8rem', borderRadius: '8px', border: '1px solid #3f3f46', 
+            background: '#18181b', color: '#fff', cursor: 'pointer',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+        }}
+      >
+        <span>{selected?.label}</span>
+        <span style={{fontSize: '0.8rem', opacity: 0.6}}>▼</span>
+      </div>
+      
+      {isOpen && (
+        <ul className="dropdown-list" style={{
+            position: 'absolute', top: '100%', left: 0, right: 0, 
+            background: '#27272a', border: '1px solid #3f3f46', 
+            borderRadius: '8px', marginTop: '4px', padding: 0, 
+            listStyle: 'none', zIndex: 100, overflow: 'hidden'
+        }}>
+          {options.map(o => (
+            <li 
+              key={o.value}
+              onClick={() => { onChange(o.value); setIsOpen(false); }}
+              style={{
+                  padding: '1rem', cursor: 'pointer', 
+                  background: value === o.value ? 'rgba(0, 229, 143, 0.1)' : 'transparent',
+                  color: value === o.value ? '#00E58F' : '#fff',
+                  borderBottom: '1px solid #3f3f46',
+                  transition: 'background 0.2s'
+              }}
+            >
+              {o.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
 export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -157,6 +216,16 @@ export default function App() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // States for Live Mode & Thermal Printer Settings
+  const [liveMode, setLiveMode] = useState('game');
+  const [printerSettings, setPrinterSettings] = useState({
+    interface: '',
+    printerType: 'epson',
+    characterSet: 'PC860_PORTUGUESE',
+    cupomTitle: 'NOVO PRESENTE!',
+    cupomSubtitle: 'TikTok Live Actions'
+  });
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
@@ -241,6 +310,15 @@ export default function App() {
           const freshUser = await userRes.json();
           setUser(freshUser);
           localStorage.setItem('user', JSON.stringify(freshUser));
+          if (freshUser.live_mode) {
+            setLiveMode(freshUser.live_mode);
+          }
+          if (freshUser.printer_settings) {
+            try {
+              const parsed = typeof freshUser.printer_settings === 'string' ? JSON.parse(freshUser.printer_settings) : freshUser.printer_settings;
+              setPrinterSettings(prev => ({ ...prev, ...parsed }));
+            } catch(e) {}
+          }
         }
 
         const statsRes = await fetch(`${API_BASE_URL}/api/user/stats`, {
@@ -272,10 +350,11 @@ export default function App() {
                    actionKeypress: r.actionType === 'keypress' ? r.actionValue : '',
                    actionSound: r.actionType === 'sound' ? r.actionValue : '',
                    actionVideo: r.actionType === 'video' ? r.actionValue : '',
-                   actionLabel: r.actionLabel || ''
+                   actionLabel: r.actionLabel || '',
+                   actionPrintMode: r.actionPrintMode || 'text_only'
                 };
              }
-             return { ...r, actionLabel: r.actionLabel || '' }; // already unified format
+             return { ...r, actionLabel: r.actionLabel || '', actionPrintMode: r.actionPrintMode || 'text_only' }; // already unified format
           });
           rulesArray = adapted;
         } else {
@@ -286,7 +365,8 @@ export default function App() {
             actionKeypress: rulesData.rules[key],
             actionSound: '',
             actionVideo: '',
-            actionLabel: ''
+            actionLabel: '',
+            actionPrintMode: 'text_only'
           }));
         }
         setRules(rulesArray);
@@ -302,7 +382,7 @@ export default function App() {
     setStatus('Salvando...');
     
     const rulesToSave = rules
-      .filter(r => r.triggerValue && (r.actionKeypress || r.actionSound || r.actionVideo))
+      .filter(r => r.triggerValue && (r.actionKeypress || r.actionSound || r.actionVideo || r.actionPrintMode))
       .map(r => ({
         id: r.id,
         triggerType: r.triggerType,
@@ -310,7 +390,8 @@ export default function App() {
         actionKeypress: r.actionKeypress || '',
         actionSound: r.actionSound || '',
         actionVideo: r.actionVideo || '',
-        actionLabel: r.actionLabel || ''
+        actionLabel: r.actionLabel || '',
+        actionPrintMode: r.actionPrintMode || 'text_only'
       }));
 
     const token = localStorage.getItem('token');
@@ -348,7 +429,8 @@ export default function App() {
       actionKeypress: '',
       actionSound: '',
       actionVideo: '',
-      actionLabel: ''
+      actionLabel: '',
+      actionPrintMode: 'text_only'
     }, ...rules]);
   };
 
@@ -491,6 +573,75 @@ export default function App() {
     }
   };
 
+  const handleSaveSettings = async () => {
+    setStatus('Salvando configurações...');
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/user/settings`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          liveMode: liveMode,
+          printerSettings: printerSettings
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Configurações da impressora salvas! 📠', 'success');
+        setStatus('Conectado ao Motor');
+      } else {
+        showToast('Erro ao salvar: ' + (data.error || 'Erro desconhecido'), 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      showToast('Erro de conexão ao salvar configurações', 'error');
+    }
+  };
+
+  const handleSaveMode = async (mode) => {
+    const token = localStorage.getItem('token');
+    try {
+      await fetch(`${API_BASE_URL}/api/user/settings`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          liveMode: mode,
+          printerSettings: printerSettings
+        })
+      });
+      showToast(`Modo de live alterado para: ${mode === 'printer' ? 'Impressão' : 'Gamer'}! ⚡`, 'success');
+    } catch(e) {
+      console.error(e);
+    }
+  };
+
+  const handleTestPrint = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/user/test-print`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Sinal de teste enviado para o CLI local!', 'success');
+      } else {
+        showToast('Erro ao testar: ' + (data.error || 'Erro desconhecido'), 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      showToast('Erro de conexão ao testar impressora', 'error');
+    }
+  };
+
   const handleDeleteAccount = async () => {
     const token = localStorage.getItem('token');
     try {
@@ -573,7 +724,7 @@ export default function App() {
               className={`sidebar-item ${activeTab === 'rules' || activeTab === 'dashboard' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard/rules')}
             >
-              <span className="icon">🎮</span> Regras de interações
+              <span className="icon">⚡</span> Live Interativa
             </div>
             
             <div 
@@ -597,6 +748,8 @@ export default function App() {
               <span className="icon">💎</span> Assinatura
             </div>
             
+
+
             <div 
               className={`sidebar-item ${activeTab === 'account' ? 'active' : ''}`}
               onClick={() => navigate('/dashboard/account')}
@@ -654,6 +807,105 @@ export default function App() {
               )}
             </div>
 
+            <div className="saas-card" style={{ marginBottom: '2rem' }}>
+              <h2 style={{ marginBottom: '1rem', color: '#fff', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                ⚙️ Tipo de Live Interativa
+              </h2>
+              <p style={{ color: '#a1a1aa', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                Escolha a forma que o seu público irá interagir com a sua transmissão ao vivo.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                <div 
+                  className={`plan-card ${liveMode === 'game' ? 'active' : ''}`} 
+                  onClick={() => { setLiveMode('game'); handleSaveMode('game'); }}
+                  style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem', border: liveMode === 'game' ? '2px solid #00E58F' : '1px solid #27272a' }}
+                >
+                  <div style={{ fontSize: '1.2rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span>🎮</span> Modo Jogo (Gamer)
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: '#a1a1aa', margin: 0, lineHeight: '1.4' }}>
+                    O público envia presentes que apertam teclas no seu teclado para controlar jogos e acionam alertas visuais/sonoros.
+                  </p>
+                </div>
+                
+                <div 
+                  className={`plan-card ${liveMode === 'printer' ? 'active' : ''}`} 
+                  onClick={() => { setLiveMode('printer'); handleSaveMode('printer'); }}
+                  style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem', border: liveMode === 'printer' ? '2px solid #00E58F' : '1px solid #27272a' }}
+                >
+                  <div style={{ fontSize: '1.2rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span>📠</span> Modo Impressão Térmica
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: '#a1a1aa', margin: 0, lineHeight: '1.4' }}>
+                    O público envia presentes que imprimem cupons físicos personalizados na sua impressora térmica. Ideal para brincadeiras de adivinhação, rifas ou sorteios.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {liveMode === 'printer' && (
+              <div className="saas-card slide-in" style={{ marginBottom: '2rem' }}>
+                <h2 style={{ marginBottom: '0.5rem' }}>📠 Configurações da Impressora Térmica</h2>
+                <p style={{ color: '#a1a1aa', fontSize: '0.9rem', marginBottom: '2rem' }}>
+                  Ajuste a porta e o layout do cupom físico. O aplicativo local atualizará automaticamente.
+                </p>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+                  <div>
+                    <div className="input-group">
+                      <label>Interface de Conexão (USB ou Porta Serial COM)</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ex: COM3, LPT1 ou NomeDaImpressora" 
+                        value={printerSettings.interface || ''}
+                        onChange={e => setPrinterSettings({ ...printerSettings, interface: e.target.value })}
+                      />
+                      <small style={{ color: '#71717a', display: 'block', marginTop: '0.25rem' }}>
+                        * USB: Nome exato no painel de controle (ex: Generic / Text Only).<br/>
+                        * Bluetooth/Serial: Porta virtual mapeada (ex: COM3).
+                      </small>
+                    </div>
+                    
+                    <div className="input-group">
+                      <label>Tipo de Protocolo (ESC/POS)</label>
+                      <CustomGenericSelect 
+                        value={printerSettings.printerType || 'epson'}
+                        onChange={val => setPrinterSettings({ ...printerSettings, printerType: val })}
+                        options={[
+                          { value: 'epson', label: 'Epson ESC/POS (Padrão para 99% das impressoras)' },
+                          { value: 'star', label: 'Star Line Mode' }
+                        ]}
+                      />
+                    </div>
+                    
+                    <div className="input-group">
+                      <label>Codificação (Character Set)</label>
+                      <CustomGenericSelect 
+                        value={printerSettings.characterSet || 'PC860_PORTUGUESE'}
+                        onChange={val => setPrinterSettings({ ...printerSettings, characterSet: val })}
+                        options={[
+                          { value: 'PC860_PORTUGUESE', label: 'Português (PC860)' },
+                          { value: 'PC850_MULTILINGUAL', label: 'Multilíngue (PC850)' },
+                          { value: 'USA', label: 'Inglês (Standard USA)' }
+                        ]}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                      <button className="btn-secondary" style={{ flex: 1, padding: '1rem' }} onClick={handleTestPrint}>
+                        📠 Testar Impressão (CLI)
+                      </button>
+                      <button className="btn-primary" style={{ flex: 1, padding: '1rem' }} onClick={handleSaveSettings}>
+                        Salvar Impressora
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="saas-card">
               <div className="input-group username-input-group" style={{marginBottom: 0}}>
                 <label>Qual conta do TikTok vamos monitorar?</label>
@@ -704,106 +956,123 @@ export default function App() {
                         availableGifts={availableGifts}
                       />
                       <div className="rule-inputs" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', flex: 1, gap: '1rem', alignItems: 'start' }}>
-                        
-                        {/* Tecla */}
-                        <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
-                           <span style={{color: '#a1a1aa', fontSize: '0.85rem'}}>⌨️ Apertar Tecla (Bot)</span>
-                           <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
-                             <input 
-                               type="text" 
-                               placeholder="Aperte uma Tecla..."
-                               value={rule.actionKeypress || ''}
-                               readOnly
-                               onKeyDown={(e) => {
-                                   e.preventDefault();
-                                   if (e.key === 'Backspace' || e.key === 'Delete') {
-                                      updateRule(rule.id, 'actionKeypress', '');
-                                      return;
-                                   }
-                                   let keyName = e.key;
-                                   if (e.code === 'Space') keyName = 'Space';
-                                   if (['Shift', 'Control', 'Alt', 'Meta'].includes(keyName)) return;
-                                   updateRule(rule.id, 'actionKeypress', keyName.toUpperCase());
-                               }}
-                               style={{flex: 1, cursor: 'pointer', textAlign: 'center', fontWeight: 'bold', border: '2px dashed rgba(255,255,255,0.2)', padding: '0.6rem', background: '#18181b', color: '#fff', borderRadius: '8px'}}
+                        {liveMode === 'printer' ? (
+                          <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: 'span 2'}}>
+                             <span style={{color: '#a1a1aa', fontSize: '0.85rem'}}>🖨️ Ação de Impressão (Modo Térmico)</span>
+                             <CustomGenericSelect
+                               value={rule.actionPrintMode || 'text_only'}
+                               onChange={val => updateRule(rule.id, 'actionPrintMode', val)}
+                               options={[
+                                 { value: 'text_only', label: 'Apenas Texto (Nome + Presente)' },
+                                 { value: 'photo_s', label: 'Texto + Foto Pequena (P)' },
+                                 { value: 'photo_l', label: 'Texto + Foto Grande (G)' },
+                                 { value: 'photo_xl', label: 'Texto + Foto Extra Grande (GG)' }
+                               ]}
                              />
-                             {rule.actionKeypress && (
-                                <button className="btn-remove-rule" style={{position: 'static', transform: 'none', background: 'transparent', color: '#ff4444', width: 'auto', height: 'auto', border: 'none', fontSize: '1.2rem'}} onClick={() => updateRule(rule.id, 'actionKeypress', '')} title="Remover Tecla">&times;</button>
-                             )}
-                           </div>
-                        </div>
+                          </div>
+                        ) : (
+                          <>
+                            {/* Tecla */}
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                               <span style={{color: '#a1a1aa', fontSize: '0.85rem'}}>⌨️ Apertar Tecla (Bot)</span>
+                               <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
+                                 <input 
+                                   type="text" 
+                                   placeholder="Aperte uma Tecla..."
+                                   value={rule.actionKeypress || ''}
+                                   readOnly
+                                   onKeyDown={(e) => {
+                                       e.preventDefault();
+                                       if (e.key === 'Backspace' || e.key === 'Delete') {
+                                          updateRule(rule.id, 'actionKeypress', '');
+                                          return;
+                                       }
+                                       let keyName = e.key;
+                                       if (e.code === 'Space') keyName = 'Space';
+                                       if (['Shift', 'Control', 'Alt', 'Meta'].includes(keyName)) return;
+                                       updateRule(rule.id, 'actionKeypress', keyName.toUpperCase());
+                                   }}
+                                   style={{flex: 1, cursor: 'pointer', textAlign: 'center', fontWeight: 'bold', border: '2px dashed rgba(255,255,255,0.2)', padding: '0.6rem', background: '#18181b', color: '#fff', borderRadius: '8px'}}
+                                 />
+                                 {rule.actionKeypress && (
+                                    <button className="btn-remove-rule" style={{position: 'static', transform: 'none', background: 'transparent', color: '#ff4444', width: 'auto', height: 'auto', border: 'none', fontSize: '1.2rem'}} onClick={() => updateRule(rule.id, 'actionKeypress', '')} title="Remover Tecla">&times;</button>
+                                 )}
+                               </div>
+                            </div>
 
-                        {/* Som */}
-                        <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
-                           <span style={{color: '#a1a1aa', fontSize: '0.85rem'}}>🎵 Tocar Som (Widget)</span>
-                           <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
-                             <label style={{ 
-                                 flex: 1, padding: '0.6rem', borderRadius: '8px', 
-                                 background: '#18181b', color: '#a1a1aa', border: '2px dashed rgba(255,255,255,0.1)',
-                                 cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s ease',
-                                 display: 'block'
-                               }}
-                               onMouseOver={(e) => e.currentTarget.style.borderColor = '#00E58F'}
-                               onMouseOut={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
-                             >
-                               {uploadingMedia.ruleId === rule.id && uploadingMedia.field === 'actionSound' ? (
-                                  <span style={{color: '#a1a1aa'}}>⏳ Enviando para a nuvem...</span>
-                               ) : rule.actionSound ? (
-                                  <span style={{color: '#00E58F', fontWeight: 'bold'}}>
-                                     📁 {(rule.actionSound.split('/').pop() || '').replace(/^[^_]+_/, '') || 'Som Selecionado'}
-                                  </span>
-                               ) : (
-                                  <span style={{fontSize: '0.9rem'}}>📂 Escolher áudio...</span>
-                               )}
-                               <input 
-                                 type="file" 
-                                 accept="audio/*"
-                                 disabled={uploadingMedia.ruleId === rule.id && uploadingMedia.field === 'actionSound'}
-                                 onChange={e => handleFileUpload(e.target.files[0], rule.id, 'actionSound')}
-                                 style={{ display: 'none' }}
-                               />
-                             </label>
-                             {rule.actionSound && (
-                                <button className="btn-remove-rule" style={{position: 'static', transform: 'none', background: 'transparent', color: '#ff4444', width: 'auto', height: 'auto', border: 'none', fontSize: '1.2rem'}} onClick={() => clearMedia(rule.id, 'actionSound')} title="Remover Som">&times;</button>
-                             )}
-                           </div>
-                        </div>
+                            {/* Som */}
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                               <span style={{color: '#a1a1aa', fontSize: '0.85rem'}}>🎵 Tocar Som (Widget)</span>
+                               <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
+                                 <label style={{ 
+                                     flex: 1, padding: '0.6rem', borderRadius: '8px', 
+                                     background: '#18181b', color: '#a1a1aa', border: '2px dashed rgba(255,255,255,0.1)',
+                                     cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s ease',
+                                     display: 'block'
+                                   }}
+                                   onMouseOver={(e) => e.currentTarget.style.borderColor = '#00E58F'}
+                                   onMouseOut={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
+                                 >
+                                   {uploadingMedia.ruleId === rule.id && uploadingMedia.field === 'actionSound' ? (
+                                      <span style={{color: '#a1a1aa'}}>⏳ Enviando para a nuvem...</span>
+                                   ) : rule.actionSound ? (
+                                      <span style={{color: '#00E58F', fontWeight: 'bold'}}>
+                                         📁 {(rule.actionSound.split('/').pop() || '').replace(/^[^_]+_/, '') || 'Som Selecionado'}
+                                      </span>
+                                   ) : (
+                                      <span style={{fontSize: '0.9rem'}}>📂 Escolher áudio...</span>
+                                   )}
+                                   <input 
+                                     type="file" 
+                                     accept="audio/*"
+                                     disabled={uploadingMedia.ruleId === rule.id && uploadingMedia.field === 'actionSound'}
+                                     onChange={e => handleFileUpload(e.target.files[0], rule.id, 'actionSound')}
+                                     style={{ display: 'none' }}
+                                   />
+                                 </label>
+                                 {rule.actionSound && (
+                                    <button className="btn-remove-rule" style={{position: 'static', transform: 'none', background: 'transparent', color: '#ff4444', width: 'auto', height: 'auto', border: 'none', fontSize: '1.2rem'}} onClick={() => clearMedia(rule.id, 'actionSound')} title="Remover Som">&times;</button>
+                                 )}
+                               </div>
+                            </div>
 
-                        {/* Vídeo */}
-                        <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
-                           <span style={{color: '#a1a1aa', fontSize: '0.85rem'}}>🎬 Exibir Vídeo (Widget)</span>
-                           <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
-                             <label style={{ 
-                                 flex: 1, padding: '0.6rem', borderRadius: '8px', 
-                                 background: '#18181b', color: '#a1a1aa', border: '2px dashed rgba(255,255,255,0.1)',
-                                 cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s ease',
-                                 display: 'block'
-                               }}
-                               onMouseOver={(e) => e.currentTarget.style.borderColor = '#00E58F'}
-                               onMouseOut={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
-                             >
-                               {uploadingMedia.ruleId === rule.id && uploadingMedia.field === 'actionVideo' ? (
-                                  <span style={{color: '#a1a1aa'}}>⏳ Enviando para a nuvem...</span>
-                               ) : rule.actionVideo ? (
-                                  <span style={{color: '#00E58F', fontWeight: 'bold'}}>
-                                     📁 {(rule.actionVideo.split('/').pop() || '').replace(/^[^_]+_/, '') || 'Vídeo Selecionado'}
-                                  </span>
-                               ) : (
-                                  <span style={{fontSize: '0.9rem'}}>📂 Escolher vídeo...</span>
-                               )}
-                               <input 
-                                 type="file" 
-                                 accept="video/*"
-                                 disabled={uploadingMedia.ruleId === rule.id && uploadingMedia.field === 'actionVideo'}
-                                 onChange={e => handleFileUpload(e.target.files[0], rule.id, 'actionVideo')}
-                                 style={{ display: 'none' }}
-                               />
-                             </label>
-                             {rule.actionVideo && (
-                                <button className="btn-remove-rule" style={{position: 'static', transform: 'none', background: 'transparent', color: '#ff4444', width: 'auto', height: 'auto', border: 'none', fontSize: '1.2rem'}} onClick={() => clearMedia(rule.id, 'actionVideo')} title="Remover Vídeo">&times;</button>
-                             )}
-                           </div>
-                        </div>
+                            {/* Vídeo */}
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                               <span style={{color: '#a1a1aa', fontSize: '0.85rem'}}>🎬 Exibir Vídeo (Widget)</span>
+                               <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
+                                 <label style={{ 
+                                     flex: 1, padding: '0.6rem', borderRadius: '8px', 
+                                     background: '#18181b', color: '#a1a1aa', border: '2px dashed rgba(255,255,255,0.1)',
+                                     cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s ease',
+                                     display: 'block'
+                                   }}
+                                   onMouseOver={(e) => e.currentTarget.style.borderColor = '#00E58F'}
+                                   onMouseOut={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
+                                 >
+                                   {uploadingMedia.ruleId === rule.id && uploadingMedia.field === 'actionVideo' ? (
+                                      <span style={{color: '#a1a1aa'}}>⏳ Enviando para a nuvem...</span>
+                                   ) : rule.actionVideo ? (
+                                      <span style={{color: '#00E58F', fontWeight: 'bold'}}>
+                                         📁 {(rule.actionVideo.split('/').pop() || '').replace(/^[^_]+_/, '') || 'Vídeo Selecionado'}
+                                      </span>
+                                   ) : (
+                                      <span style={{fontSize: '0.9rem'}}>📂 Escolher vídeo...</span>
+                                   )}
+                                   <input 
+                                     type="file" 
+                                     accept="video/*"
+                                     disabled={uploadingMedia.ruleId === rule.id && uploadingMedia.field === 'actionVideo'}
+                                     onChange={e => handleFileUpload(e.target.files[0], rule.id, 'actionVideo')}
+                                     style={{ display: 'none' }}
+                                   />
+                                 </label>
+                                 {rule.actionVideo && (
+                                    <button className="btn-remove-rule" style={{position: 'static', transform: 'none', background: 'transparent', color: '#ff4444', width: 'auto', height: 'auto', border: 'none', fontSize: '1.2rem'}} onClick={() => clearMedia(rule.id, 'actionVideo')} title="Remover Vídeo">&times;</button>
+                                 )}
+                                </div>
+                            </div>
+                          </>
+                        )}
 
                         {/* Texto na Legenda */}
                         <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
@@ -818,8 +1087,6 @@ export default function App() {
                              />
                            </div>
                         </div>
-
-
                       </div>
                       <button 
                         className="btn-remove-rule" 
@@ -1178,6 +1445,8 @@ export default function App() {
             </div>
           </div>
         )}
+
+
 
       </main>
 

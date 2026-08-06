@@ -29,6 +29,8 @@ function initDb() {
             trial_time_used INTEGER DEFAULT 0,
             is_admin BOOLEAN DEFAULT 0,
             pro_expires_at DATETIME,
+            live_mode TEXT DEFAULT 'game',
+            printer_settings TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`);
         
@@ -36,6 +38,8 @@ function initDb() {
         db.run(`ALTER TABLE users ADD COLUMN trial_time_used INTEGER DEFAULT 0`, (err) => { /* ignora erro */ });
         db.run(`ALTER TABLE users ADD COLUMN pro_expires_at DATETIME`, (err) => { /* ignora erro */ });
         db.run(`ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT 0`, (err) => { /* ignora erro */ });
+        db.run(`ALTER TABLE users ADD COLUMN live_mode TEXT DEFAULT 'game'`, (err) => { /* ignora erro */ });
+        db.run(`ALTER TABLE users ADD COLUMN printer_settings TEXT`, (err) => { /* ignora erro */ });
 
         // Tabela de Regras (Uma por usuário)
         db.run(`CREATE TABLE IF NOT EXISTS rules (
