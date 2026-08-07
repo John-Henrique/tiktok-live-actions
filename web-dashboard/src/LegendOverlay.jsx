@@ -88,6 +88,17 @@ const LegendOverlay = () => {
             if (rule.actionKeypress) actionTexts.push(`Aperta ${rule.actionKeypress}`);
             if (rule.actionSound) actionTexts.push('Som');
             if (rule.actionVideo) actionTexts.push('Vídeo');
+            
+            if (actionTexts.length === 0 && rule.actionPrintMode) {
+              const printLabels = {
+                'text_only': 'Imprime Nome',
+                'photo_s': 'Foto (P)',
+                'photo_l': 'Foto (G)',
+                'photo_xl': 'Foto (GG)'
+              };
+              actionTexts.push(printLabels[rule.actionPrintMode] || 'Impressão');
+            }
+            
             actionText = actionTexts.join(' + ');
           }
 
