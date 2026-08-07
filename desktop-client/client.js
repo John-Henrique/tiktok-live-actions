@@ -57,19 +57,19 @@ function pollForAuth() {
             try {
                 const parsed = JSON.parse(responseData);
                 if (parsed.authenticated && parsed.token) {
-                    console.log("✅ Acesso autorizado pelo painel web!\n");
+                    console.log("\x1b[32m[OK]\x1b[0m Acesso autorizado pelo painel web!\n");
                     startSocket(parsed.token);
                 } else {
                     // Tenta de novo em 2 segundos
                     setTimeout(pollForAuth, 2000);
                 }
             } catch (e) {
-                console.error("❌ Erro ao ler resposta do servidor.");
+                console.error("\x1b[31m[ERRO]\x1b[0m Erro ao ler resposta do servidor.");
                 setTimeout(pollForAuth, 2000);
             }
         });
     }).on('error', (e) => {
-        console.error(`❌ Erro de conexão com servidor: ${e.message}`);
+        console.error(`\x1b[31m[ERRO]\x1b[0m Erro de conexão com servidor: ${e.message}`);
         setTimeout(pollForAuth, 2000);
     });
 }
@@ -141,7 +141,7 @@ function initPrinter(settings) {
         // Ativa modo de cabeça para baixo para texto se configurado
         printer.upsideDown(settings.upsideDown || false);
     } catch (e) {
-        console.error("❌ Erro ao inicializar impressora térmica:", e.message);
+        console.error("\x1b[31m[ERRO]\x1b[0m Erro ao inicializar impressora térmica:", e.message);
         printer = null;
     }
 }
@@ -217,7 +217,7 @@ Add-Type -TypeDefinition $code -ErrorAction SilentlyContinue
             try {
                 fs.writeFileSync(tempPs1File, psScript, 'utf-8');
             } catch (errWrite) {
-                console.error("❌ Erro ao escrever script ps1 temporário:", errWrite.message);
+                console.error("\x1b[31m[ERRO]\x1b[0m Erro ao escrever script ps1 temporário:", errWrite.message);
                 try { fs.unlinkSync(tempFile); } catch(e) {}
                 reject(errWrite);
                 return;
@@ -227,7 +227,7 @@ Add-Type -TypeDefinition $code -ErrorAction SilentlyContinue
                 try { fs.unlinkSync(tempPs1File); } catch(e) {}
                 try { fs.unlinkSync(tempFile); } catch(e) {}
                 if (err) {
-                    console.error("❌ Erro ao enviar comandos RAW para o Windows Spooler:", stderr || stdout);
+                    console.error("\x1b[31m[ERRO]\x1b[0m Erro ao enviar comandos RAW para o Windows Spooler:", stderr || stdout);
                     reject(err);
                 } else {
                     resolve();
@@ -377,7 +377,7 @@ if ('${printMode}' -eq 'photo_s') {
     try {
         fs.writeFileSync(tempPs1File, psScript, 'utf-8');
     } catch (errWrite) {
-        console.error("❌ Erro ao escrever script de composição ps1:", errWrite.message);
+        console.error("\x1b[31m[ERRO]\x1b[0m Erro ao escrever script de composição ps1:", errWrite.message);
         return Promise.reject(errWrite);
     }
 
@@ -385,7 +385,7 @@ if ('${printMode}' -eq 'photo_s') {
         exec(`powershell -ExecutionPolicy Bypass -File "${tempPs1File}"`, (err, stdout, stderr) => {
             try { fs.unlinkSync(tempPs1File); } catch(e) {}
             if (err) {
-                console.error("❌ Erro no PowerShell ao compor quadro:", stderr || stdout);
+                console.error("\x1b[31m[ERRO]\x1b[0m Erro no PowerShell ao compor quadro:", stderr || stdout);
                 reject(err);
             } else {
                 resolve();
@@ -428,7 +428,7 @@ $fontSub.Dispose();
     return new Promise((resolve, reject) => {
         exec(`powershell -Command "${psCommand}"`, (err, stdout, stderr) => {
             if (err) {
-                console.error("❌ Erro no PowerShell ao compor teste:", stderr || stdout);
+                console.error("\x1b[31m[ERRO]\x1b[0m Erro no PowerShell ao compor teste:", stderr || stdout);
                 reject(err);
             } else {
                 resolve();
@@ -440,7 +440,7 @@ $fontSub.Dispose();
 // Executa a impressão física do presente
 async function executePrintJob(username, giftName, printMode = 'text_only', giftIconUrl = '') {
     if (!printer) {
-        console.warn("⚠️ Impressora não conectada/configurada.");
+        console.warn("\x1b[33m[AVISO]\x1b[0m Impressora não conectada/configurada.");
         return;
     }
     
@@ -464,7 +464,7 @@ async function executePrintJob(username, giftName, printMode = 'text_only', gift
                 try {
                     await downloadImage(giftIconUrl, tempGiftPath);
                 } catch (errImg) {
-                    console.error("⚠️ Erro ao baixar imagem do presente:", errImg.message);
+                    console.error("\x1b[33m[AVISO]\x1b[0m Erro ao baixar imagem do presente:", errImg.message);
                 }
             }
             
@@ -491,14 +491,14 @@ async function executePrintJob(username, giftName, printMode = 'text_only', gift
         printer.clear();
         console.log(`📠 Cupom impresso para @${username} [Modo: ${printMode}]`);
     } catch (err) {
-        console.error("❌ Falha na impressão:", err.message);
+        console.error("\x1b[31m[ERRO]\x1b[0m Falha na impressão:", err.message);
     }
 }
 
 // Teste de impressão sequencial de todos os formatos (Texto, P, G, GG)
 async function executeTestPrint() {
     if (!printer) {
-        console.warn("⚠️ Impressora não configurada. Por favor, defina a interface no painel primeiro.");
+        console.warn("\x1b[33m[AVISO]\x1b[0m Impressora não configurada. Por favor, defina a interface no painel primeiro.");
         return;
     }
     try {
@@ -508,7 +508,7 @@ async function executeTestPrint() {
         const roseUrl = `${BACKEND_URL}/gifts/Rose-5655.png`;
         const tempGiftPath = path.join(tempDir, `test_rose.png`);
         
-        console.log(`⏳ Baixando imagem da Rosa para a bateria de testes de impressão...`);
+        console.log(`\x1b[36m[INFO]\x1b[0m Baixando imagem da Rosa para a bateria de testes de impressão...`);
         try {
             await downloadImage(roseUrl, tempGiftPath);
         } catch (e) {
@@ -587,7 +587,7 @@ async function executeTestPrint() {
 
         console.log("📠 Bateria de testes de impressão concluída!");
     } catch (err) {
-        console.error("❌ Erro no teste de impressão sequencial:", err.message);
+        console.error("\x1b[31m[ERRO]\x1b[0m Erro no teste de impressão sequencial:", err.message);
     }
 }
 
@@ -609,7 +609,7 @@ async function processPrintQueue() {
     try {
         await currentJob();
     } catch (err) {
-        console.error("❌ Erro ao processar trabalho de impressão na fila:", err.message);
+        console.error("\x1b[31m[ERRO]\x1b[0m Erro ao processar trabalho de impressão na fila:", err.message);
     } finally {
         // Pausa curta de 200ms para garantir a liberação física de spooler/arquivos
         setTimeout(() => {
@@ -648,16 +648,16 @@ function startSocket(token) {
     });
 
     socket.on("tiktok-connected", (data) => {
-        console.log(`[TikTok] ✅ ${data.message} (@${data.username})`);
+        console.log(`[TikTok] \x1b[32m[OK]\x1b[0m ${data.message} (@${data.username})`);
         console.log(`Aguardando eventos da SUA live...`);
     });
 
     socket.on("tiktok-error", (data) => {
-        console.error(`[TikTok] ❌ Erro: ${data.message}`);
+        console.error(`[TikTok] \x1b[31m[ERRO]\x1b[0m Erro: ${data.message}`);
     });
 
     socket.on("tiktok-disconnected", (data) => {
-        console.warn(`[TikTok] ⚠️ ${data.message}`);
+        console.warn(`[TikTok] \x1b[33m[AVISO]\x1b[0m ${data.message}`);
     });
 
     let hasTrialExpired = false;
@@ -665,7 +665,7 @@ function startSocket(token) {
         if (hasTrialExpired) return;
         hasTrialExpired = true;
         console.log(`\n======================================`);
-        console.log(`❌ ATENÇÃO: ${data.message}`);
+        console.log(`\x1b[31m[ERRO]\x1b[0m ATENÇÃO: ${data.message}`);
         console.log(`Pressione qualquer tecla para abrir a tela de Upgrade...`);
         console.log(`======================================\n`);
         
@@ -698,7 +698,7 @@ function startSocket(token) {
             const cooldownKey = `rule_${rule.id}`;
             const now = Date.now();
             if (cooldowns.has(cooldownKey) && (now - cooldowns.get(cooldownKey) < COOLDOWN_MS)) {
-                console.log(`⏳ Spam evitado: Regra para '${value}' está em tempo de recarga.`);
+                console.log(`\x1b[36m[INFO]\x1b[0m Spam evitado: Regra para '${value}' está em tempo de recarga.`);
                 continue;
             }
             cooldowns.set(cooldownKey, now);
@@ -708,10 +708,10 @@ function startSocket(token) {
                 await executeAction(rule.actionKeypress);
             }
             if (rule.actionSound) {
-                console.log(`🎵 Regra Encontrada: ${value} -> Áudio disparado no Widget (OBS)`);
+                console.log(`[AUDIO] Regra Encontrada: ${value} -> Áudio disparado no Widget (OBS)`);
             }
             if (rule.actionVideo) {
-                console.log(`🎬 Regra Encontrada: ${value} -> Vídeo disparado no Widget (OBS)`);
+                console.log(`[VIDEO] Regra Encontrada: ${value} -> Vídeo disparado no Widget (OBS)`);
             }
         }
     };
@@ -721,7 +721,7 @@ function startSocket(token) {
         if (data.repeatEnd === false) {
             return;
         }
-        console.log(`\n🎁 PRESENTE: ${data.giftName} (de ${data.username})`);
+        console.log(`\n\x1b[35m[PRESENTE]\x1b[0m PRESENTE: ${data.giftName} (de ${data.username})`);
         if (liveMode === 'printer') {
             const rule = userRules.find(r => r.triggerType === 'gift' && r.triggerValue.toLowerCase() === data.giftName.toLowerCase());
             const printMode = rule ? rule.actionPrintMode : 'text_only';
@@ -732,7 +732,7 @@ function startSocket(token) {
     });
 
     socket.on("follow", (data) => {
-        console.log(`\n👤 NOVO SEGUIDOR: ${data.username}`);
+        console.log(`\n\x1b[36m[SEGUIDOR]\x1b[0m NOVO SEGUIDOR: ${data.username}`);
         if (liveMode === 'printer') {
             const rule = userRules.find(r => r.triggerType === 'follow');
             const printMode = rule ? rule.actionPrintMode : 'text_only';
@@ -743,7 +743,7 @@ function startSocket(token) {
     });
     
     socket.on("like", async (data) => {
-        console.log(`\n❤️ CURTIDA: ${data.username}`);
+        console.log(`\n\x1b[31m[CURTIDA]\x1b[0m CURTIDA: ${data.username}`);
         if (liveMode === 'printer') {
             // Normalmente curtida não imprime
         } else {
@@ -752,7 +752,7 @@ function startSocket(token) {
     });
 
     socket.on("share", (data) => {
-        console.log(`\n🔄 COMPARTILHAMENTO: ${data.username}`);
+        console.log(`\n\x1b[34m[COMPARTILHOU]\x1b[0m COMPARTILHAMENTO: ${data.username}`);
         if (liveMode === 'printer') {
             const rule = userRules.find(r => r.triggerType === 'share');
             const printMode = rule ? rule.actionPrintMode : 'text_only';
