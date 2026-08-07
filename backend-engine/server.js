@@ -501,6 +501,18 @@ app.post('/api/user/test-print', authenticateToken, (req, res) => {
     res.json({ success: true, message: 'Sinal de teste enviado para a impressora' });
 });
 
+app.post('/api/user/test-widget', authenticateToken, (req, res) => {
+    io.to(req.user.id.toString()).emit('gift-received', {
+        username: 'UsuarioTeste',
+        giftName: 'Rosa',
+        giftId: 5655,
+        repeatCount: 1,
+        repeatEnd: true,
+        giftIconUrl: 'https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/eba762fb1f10ec8cb4d3d7afbd49dd60~tplv-obj.png',
+        profilePictureUrl: 'https://ui-avatars.com/api/?name=U&background=transparent&color=fff'
+    });
+    res.json({ success: true, message: 'Sinal de teste enviado para o widget' });
+});
 
 app.put('/api/auth/password', authenticateToken, (req, res) => {
     const { newPassword } = req.body;

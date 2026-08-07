@@ -212,10 +212,13 @@ export default function App() {
   const [widgetMode, setWidgetMode] = useState('presentes');
   const [legendStyle, setLegendStyle] = useState('vertical');
   
+  const [legendTitle, setLegendTitle] = useState('MENU DE AÇÕES');
+
   // States for account tab
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
 
   // States for Live Mode & Thermal Printer Settings
   const [liveMode, setLiveMode] = useState('game');
@@ -619,6 +622,25 @@ export default function App() {
       showToast(`Modo de live alterado para: ${mode === 'printer' ? 'Impressão' : 'Gamer'}! ⚡`, 'success');
     } catch(e) {
       console.error(e);
+    }
+  };
+
+  const handleTestWidget = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/user/test-widget`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Widget testado com sucesso!', 'success');
+      } else {
+        showToast(data.error || 'Erro ao testar widget', 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      showToast('Erro de conexão ao testar widget', 'error');
     }
   };
 
@@ -1188,6 +1210,9 @@ export default function App() {
                 <li style={{marginBottom: '0.5rem'}}>Cole a URL no campo correspondente, coloque Largura <strong>600</strong> e Altura <strong>800</strong>.</li>
                 <li>Sempre que uma regra for disparada, a imagem do presente piscará na tela do seu OBS!</li>
                 </ol>
+              <div className="input-group" style={{marginTop: '0.5rem'}}>
+                <button className="btn-secondary" onClick={handleTestWidget}>🧪 Testar Alerta do Widget</button>
+              </div>
 
                 <hr style={{ borderColor: 'rgba(255,255,255,0.1)', margin: '2rem 0' }} />
 
@@ -1209,19 +1234,28 @@ export default function App() {
                   </select>
                 </div>
 
+                <div className="input-group" style={{marginBottom: '1rem'}}>
+                  <label>Título do Menu (Ex: IMPRIMA SUA FOTO)</label>
+                  <input 
+                    type="text" 
+                    value={legendTitle} 
+                    onChange={e => setLegendTitle(e.target.value)}
+                    style={{ padding: '10px', background: '#121214', color: '#fff', border: '1px solid #27272a', borderRadius: '8px', width: '100%', fontSize: '1rem' }}
+                  />
+                </div>
+
                 <div className="input-group">
                   <label>Link Exclusivo do seu Menu de Presentes</label>
                   <input 
                     type="text" 
                     readOnly 
-                    value={`${window.location.origin}/legend?style=${legendStyle}&token=${localStorage.getItem('token')}`}
+                    value={`${window.location.origin}/legend?style=${legendStyle}&title=${encodeURIComponent(legendTitle)}&token=${localStorage.getItem('token')}`}
                     onClick={(e) => { e.target.select(); navigator.clipboard.writeText(e.target.value); showToast('URL copiada para a área de transferência!'); }}
                     style={{cursor: 'pointer', fontFamily: 'monospace', color: '#00E58F', background: 'rgba(0, 229, 143, 0.1)'}}
                   />
                 </div>
 
                 <ol style={{color: '#e4e4e7', marginLeft: '1.2rem', lineHeight: '1.6', marginTop: '1rem'}}>
-                  <li style={{marginBottom: '0.5rem'}}>Copie a URL acima.</li>
                   <li style={{marginBottom: '0.5rem'}}>Adicione uma nova Fonte de Navegador (Browser) no OBS.</li>
                   <li style={{marginBottom: '0.5rem'}}>Para formato Vertical use Largura 300 e Altura 800. Para Horizontal use Largura 1000 e Altura 150.</li>
                 </ol>

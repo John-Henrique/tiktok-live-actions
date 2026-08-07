@@ -8,6 +8,7 @@ const LegendOverlay = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const style = searchParams.get('style') || 'vertical';
+  const customTitle = searchParams.get('title') || 'MENU DE AÇÕES';
   
   const [rules, setRules] = useState([]);
   const [gifts, setGifts] = useState([]);
@@ -70,7 +71,7 @@ const LegendOverlay = () => {
 
   return (
     <div className={`legend-overlay-container ${style}`}>
-      <div className="legend-title">MENU DE AÇÕES</div>
+      <div className="legend-title">{customTitle}</div>
       <div className="legend-list">
         {rules.map((rule, idx) => {
           let giftInfo = gifts.find(g => g.name === rule.triggerValue);
