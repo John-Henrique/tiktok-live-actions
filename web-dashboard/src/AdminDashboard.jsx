@@ -285,7 +285,7 @@ export default function AdminDashboard() {
               <th>Email</th>
               <th>Status</th>
               <th>Criado em</th>
-              <th>Trial Usado (min)</th>
+              <th>Tempo Restante (min)</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -302,7 +302,7 @@ export default function AdminDashboard() {
                   </span>
                 </td>
                 <td>{new Date(user.created_at).toLocaleDateString('pt-BR')}</td>
-                <td>{Math.floor((user.trial_time_used || 0) / 60000)} min</td>
+                <td>{Math.max(0, 60 - Math.floor((user.trial_time_used || 0) / 60000))} min</td>
                 <td>
                   <button className="btn-small btn-action" onClick={() => { setModalUserId(user.id); setModalMinutes('60'); setModalOpen(true); }}>
                     + Tempo de Trial

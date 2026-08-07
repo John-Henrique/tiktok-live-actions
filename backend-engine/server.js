@@ -135,6 +135,7 @@ function connectToTikTok(userId, username, isTrial) {
                             console.log(`[TikTok] Trial expirado para usuário ${userId}. Desconectando...`);
                             io.to(userId.toString()).emit('trial-expired', { message: 'Seu tempo de teste de 1 hora acabou.' });
                             db.run('UPDATE users SET trial_used = 1 WHERE id = ?', [userId]);
+                            clearInterval(intervalId);
                             if (activeConnections.has(userId)) {
                                 const conn = activeConnections.get(userId);
                                 conn.connection.disconnect(); // Isso vai disparar o evento disconnected e limpar o interval

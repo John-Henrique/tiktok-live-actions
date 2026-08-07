@@ -137,6 +137,9 @@ function initPrinter(settings) {
                 timeout: 5000
             }
         });
+        
+        // Ativa modo de cabeça para baixo para texto se configurado
+        printer.upsideDown(settings.upsideDown || false);
     } catch (e) {
         console.error("❌ Erro ao inicializar impressora térmica:", e.message);
         printer = null;
@@ -239,6 +242,7 @@ async function composeAndPrintImage(username, inputImg, outputImg, printMode) {
     const cleanInputImg = path.resolve(inputImg).replace(/\\/g, '\\\\');
     const cleanOutputImg = path.resolve(outputImg).replace(/\\/g, '\\\\');
     const tempPs1File = path.resolve(path.join(getTempDir(), 'temp_compose.ps1')).replace(/\\/g, '\\\\');
+    const rotate180 = printerSettings.upsideDown ? 'true' : 'false';
 
     const psScript = `
 [void][System.Reflection.Assembly]::LoadWithPartialName('System.Drawing')
@@ -304,6 +308,11 @@ if ('${printMode}' -eq 'photo_s') {
     $textX = 160
     $textY = (150 - $textSize.Height) / 2
     $g.DrawString($usernameStr, $font, $brush, $textX, $textY)
+    
+    if ('${rotate180}' -eq 'true') {
+        $canvas.RotateFlip([System.Drawing.RotateFlipType]::Rotate180FlipNone)
+    }
+    
     $canvas.Save('${cleanOutputImg}', [System.Drawing.Imaging.ImageFormat]::Png)
     $canvas.Dispose()
     $g.Dispose()
@@ -352,6 +361,11 @@ if ('${printMode}' -eq 'photo_s') {
         $img.Dispose()
         if ($tempPng -and (Test-Path $tempPng)) { Remove-Item $tempPng -Force -ErrorAction SilentlyContinue }
     }
+    
+    if ('${rotate180}' -eq 'true') {
+        $canvas.RotateFlip([System.Drawing.RotateFlipType]::Rotate180FlipNone)
+    }
+    
     $canvas.Save('${cleanOutputImg}', [System.Drawing.Imaging.ImageFormat]::Png)
     $canvas.Dispose()
     $g.Dispose()
@@ -646,7 +660,10 @@ function startSocket(token) {
         console.warn(`[TikTok] ⚠️ ${data.message}`);
     });
 
+    let hasTrialExpired = false;
     socket.on("trial-expired", (data) => {
+        if (hasTrialExpired) return;
+        hasTrialExpired = true;
         console.log(`\n======================================`);
         console.log(`❌ ATENÇÃO: ${data.message}`);
         console.log(`Pressione qualquer tecla para abrir a tela de Upgrade...`);

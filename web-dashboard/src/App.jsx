@@ -224,7 +224,8 @@ export default function App() {
     printerType: 'epson',
     characterSet: 'PC860_PORTUGUESE',
     cupomTitle: 'NOVO PRESENTE!',
-    cupomSubtitle: 'TikTok Live Actions'
+    cupomSubtitle: 'TikTok Live Actions',
+    upsideDown: false
   });
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -889,6 +890,19 @@ export default function App() {
                           { value: 'USA', label: 'Inglês (Standard USA)' }
                         ]}
                       />
+                    </div>
+
+                    <div className="input-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
+                      <input 
+                        type="checkbox" 
+                        id="upsideDown"
+                        checked={printerSettings.upsideDown || false}
+                        onChange={e => setPrinterSettings({ ...printerSettings, upsideDown: e.target.checked })}
+                        style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                      />
+                      <label htmlFor="upsideDown" style={{ cursor: 'pointer', margin: 0, textTransform: 'none', fontSize: '1rem', letterSpacing: 'normal' }}>
+                        🙃 Imprimir de cabeça para baixo (180°)
+                      </label>
                     </div>
                   </div>
                   
